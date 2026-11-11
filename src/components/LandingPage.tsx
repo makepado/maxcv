@@ -238,13 +238,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         김민준 (Minjun Kim)
                       </h2>
                       <p className="text-xs font-semibold text-zinc-500 mt-1">
-                        Senior Product Engineer · Frontend Architect
+                        Software Engineer
                       </p>
                     </div>
                     <div className="text-right text-[11px] text-zinc-400 font-mono">
                       minjun.kim@maxcv.dev
-                      <br />
-                      Seoul, Republic of Korea
                     </div>
                   </div>
 
