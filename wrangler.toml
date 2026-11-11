@@ -1,0 +1,8 @@
+name = "maxcv"
+compatibility_date = "2026-11-01"
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "hongjaed1db"
+database_id = "ed1dc3cc-8ded-448b-94a7-c735aa3839e3"
