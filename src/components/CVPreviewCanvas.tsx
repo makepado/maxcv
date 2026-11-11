@@ -200,8 +200,12 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
             borderColor: accent,
           }}
         >
-          {design.showSectionIcons && getSectionIcon(section.type)}
-          <span className="tracking-tight">{section.title}</span>
+          {design.showSectionIcons && (
+            <span className="cv-inline-icon inline-flex items-center justify-center shrink-0 leading-none">
+              {getSectionIcon(section.type)}
+            </span>
+          )}
+          <span className="tracking-tight leading-none">{section.title}</span>
         </div>
       );
     }
@@ -210,13 +214,18 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
       return (
         <div className="cv-section-header mb-2.5">
           <div
-            className="flex items-center gap-2 pb-1"
+            className="flex items-center gap-2 pb-1.5"
             style={{ ...baseHeadingStyle, color: textCol }}
           >
             {design.showSectionIcons && (
-              <span style={{ color: accent }}>{getSectionIcon(section.type)}</span>
+              <span
+                className="cv-inline-icon inline-flex items-center justify-center shrink-0 leading-none"
+                style={{ color: accent }}
+              >
+                {getSectionIcon(section.type)}
+              </span>
             )}
-            <span>{section.title}</span>
+            <span className="leading-none">{section.title}</span>
           </div>
           <div className="flex items-center w-full">
             <div className="h-[2.5px] w-10 rounded-full" style={{ backgroundColor: accent }} />
@@ -237,9 +246,14 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
           }}
         >
           {design.showSectionIcons && (
-            <span style={{ color: accent }}>{getSectionIcon(section.type)}</span>
+            <span
+              className="cv-inline-icon inline-flex items-center justify-center shrink-0 leading-none"
+              style={{ color: accent }}
+            >
+              {getSectionIcon(section.type)}
+            </span>
           )}
-          <span>{section.title}</span>
+          <span className="leading-none">{section.title}</span>
         </div>
       );
     }
@@ -254,8 +268,12 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
             color: accent,
           }}
         >
-          {design.showSectionIcons && getSectionIcon(section.type)}
-          <span>{section.title}</span>
+          {design.showSectionIcons && (
+            <span className="cv-inline-icon inline-flex items-center justify-center shrink-0 leading-none">
+              {getSectionIcon(section.type)}
+            </span>
+          )}
+          <span className="leading-none">{section.title}</span>
         </div>
       );
     }
@@ -263,15 +281,19 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
     // caps-minimal or icon-border
     return (
       <div
-        className="cv-section-header flex items-center gap-2 pb-1 mb-2.5 border-b border-slate-300 uppercase tracking-wider"
+        className="cv-section-header flex items-center gap-2 pb-1.5 mb-2.5 border-b border-slate-300 uppercase tracking-wider"
         style={{
           ...baseHeadingStyle,
           fontSize: `${baseFontSizePt * 1.05}pt`,
           color: accent,
         }}
       >
-        {design.showSectionIcons && getSectionIcon(section.type)}
-        <span>{section.title}</span>
+        {design.showSectionIcons && (
+          <span className="cv-inline-icon inline-flex items-center justify-center shrink-0 leading-none">
+            {getSectionIcon(section.type)}
+          </span>
+        )}
+        <span className="leading-none">{section.title}</span>
       </div>
     );
   };
@@ -577,7 +599,7 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
 
             {/* 연락처 및 소셜 링크 */}
             <div
-              className={`flex flex-wrap gap-x-3.5 gap-y-1.5 mt-3 ${
+              className={`flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-3 ${
                 design.headerLayout === 'center'
                   ? 'justify-center'
                   : design.headerLayout === 'right'
@@ -590,27 +612,32 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
               }}
             >
               {metaList.map((m, idx) => (
-                <div key={idx} className="inline-flex items-center gap-1.5">
+                <div key={idx} className="cv-header-meta-item inline-flex items-center gap-1.5 leading-none">
                   {design.showHeaderIcons !== false && (
-                    <span style={{ color: iconColor }}>{m.icon}</span>
+                    <span
+                      className="cv-inline-icon inline-flex items-center justify-center shrink-0 leading-none"
+                      style={{ color: iconColor }}
+                    >
+                      {m.icon}
+                    </span>
                   )}
                   {m.href ? (
-                    <a href={m.href} className="hover:underline">
+                    <a href={m.href} className="cv-inline-text hover:underline leading-none">
                       {m.text}
                     </a>
                   ) : (
-                    <span>{m.text}</span>
+                    <span className="cv-inline-text leading-none">{m.text}</span>
                   )}
                 </div>
               ))}
 
               {personal.customFields?.map((cf) =>
                 cf.value ? (
-                  <div key={cf.id} className="inline-flex items-center gap-1">
-                    <span className="font-semibold" style={{ color: iconColor }}>
+                  <div key={cf.id} className="cv-header-meta-item inline-flex items-center gap-1 leading-none">
+                    <span className="font-semibold leading-none" style={{ color: iconColor }}>
                       {cf.label}:
                     </span>
-                    <span>{cf.value}</span>
+                    <span className="leading-none">{cf.value}</span>
                   </div>
                 ) : null
               )}
@@ -622,12 +649,19 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
                     href={link.url || '#'}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 hover:underline font-medium"
+                    className="cv-header-meta-item inline-flex items-center gap-1.5 hover:underline font-medium leading-none"
                   >
                     {design.showHeaderIcons !== false && (
-                      <span style={{ color: iconColor }}>{getSocialIcon(link.platform)}</span>
+                      <span
+                        className="cv-inline-icon inline-flex items-center justify-center shrink-0 leading-none"
+                        style={{ color: iconColor }}
+                      >
+                        {getSocialIcon(link.platform)}
+                      </span>
                     )}
-                    <span>{design.linkShowFullUrl && link.url ? link.url : link.label || link.url}</span>
+                    <span className="cv-inline-text leading-none">
+                      {design.linkShowFullUrl && link.url ? link.url : link.label || link.url}
+                    </span>
                   </a>
                 ) : null
               )}

@@ -26,6 +26,17 @@ export async function downloadResumePdfFile(doc: CVDocument): Promise<boolean> {
   // 복제본 내부의 .no-print 요소 제거
   clone.querySelectorAll('.no-print').forEach((el) => el.remove());
 
+  // html2canvas 렌더링 시 텍스트 베이스라인이 SVG 아이콘보다 아래로 내려가는 현상 보정 (수직 중앙 정렬)
+  clone.querySelectorAll('.cv-inline-icon').forEach((el) => {
+    const htmlEl = el as HTMLElement;
+    htmlEl.style.position = 'relative';
+    htmlEl.style.top = '3.5px';
+  });
+  clone.querySelectorAll('.cv-section-header').forEach((el) => {
+    const htmlEl = el as HTMLElement;
+    htmlEl.style.paddingBottom = '8px';
+  });
+
   wrapper.appendChild(clone);
   document.body.appendChild(wrapper);
 
