@@ -90,12 +90,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* 미니멀 상단 네비게이션 */}
       <header className="sticky top-0 z-30 bg-[#fafafa]/85 backdrop-blur-md border-b border-zinc-200/80">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-zinc-950 text-white font-black text-sm flex items-center justify-center tracking-tighter">
+          <a
+            href="/"
+            className="flex items-center gap-2.5 group cursor-pointer transition-opacity hover:opacity-80"
+            title="MaxCV 홈으로 이동"
+          >
+            <div className="w-8 h-8 rounded-lg bg-zinc-950 group-hover:bg-zinc-800 text-white font-black text-sm flex items-center justify-center tracking-tighter transition-colors">
               M
             </div>
             <span className="font-extrabold text-lg tracking-tight text-zinc-950">MaxCV</span>
-          </div>
+          </a>
 
           <div className="flex items-center gap-3">
             <button
