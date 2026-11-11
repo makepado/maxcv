@@ -1,15 +1,5 @@
 import React from 'react';
-import {
-  ArrowRight,
-  Type,
-  Layers,
-  Database,
-  Download,
-  Sparkles,
-  Check,
-  ShieldCheck,
-  Sliders,
-} from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useCVStore } from '../store/useCVStore';
 import { DEFAULT_GOOGLE_CLIENT_ID } from './GoogleAuthModal';
 import { GoogleUserProfile } from '../types/cv';
@@ -309,72 +299,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 유니콘 스타트업 감성의 Bento Grid 아키텍처 섹션 */}
-        <section id="architecture" className="max-w-5xl mx-auto px-6 pb-28">
-          <div className="text-center mb-12">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-zinc-400">
-              BUILT FOR PERFECTION
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-950 mt-2 tracking-tight">
-              이력서 작성의 모든 디테일을 하나로.
-            </h2>
-          </div>
-
-          <div id="typography" className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-6 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs space-y-3">
-              <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center">
-                <Type className="w-4 h-4" />
-              </div>
-              <h3 className="text-sm font-bold text-zinc-950">20종 한국어 무료 웹폰트</h3>
-              <p className="text-xs text-zinc-500 leading-relaxed">
-                프리텐다드, 원티드 산스, 수트, 스포카 한 산스 등 현대 고딕부터 마루부리, 리디바탕, 코펍월드바탕, 본명조 등 정통 명조체까지 완벽 지원합니다.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs space-y-3">
-              <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center">
-                <Sliders className="w-4 h-4" />
-              </div>
-              <h3 className="text-sm font-bold text-zinc-950">밀리미터 단위 레이아웃 조판</h3>
-              <p className="text-xs text-zinc-500 leading-relaxed">
-                1단 표준형과 2단 좌·우 사이드바 구조, 컬럼 비율, 상하좌우 여백(mm), 섹션 간격, 한글 어절 끊김 방지를 실시간으로 조절합니다.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs space-y-3">
-              <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center">
-                <Layers className="w-4 h-4" />
-              </div>
-              <h3 className="text-sm font-bold text-zinc-950">15개 전문 커리어 섹션</h3>
-              <p className="text-xs text-zinc-500 leading-relaxed">
-                경력, 학력, 프로젝트, 보유 기술, 어학, 자격증, 수상, 논문·출판, 대외활동, 추천인, 커스텀 섹션까지 모든 이력서 구성을 담았습니다.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs space-y-3 md:col-span-2">
-              <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center">
-                <Database className="w-4 h-4" />
-              </div>
-              <h3 className="text-sm font-bold text-zinc-950">
-                Google 계정 기준 Cloudflare D1 클라우드 동기화
-              </h3>
-              <p className="text-xs text-zinc-500 leading-relaxed">
-                로그인한 Google 이메일 계정별로 이력서 데이터가 Cloudflare D1 SQLite 데이터베이스에 독립적으로 분리 저장됩니다. 여러 대의 기기에서 접속해도 내 계정의 이력서 보관함을 그대로 이어서 편집할 수 있습니다.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs space-y-3">
-              <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center">
-                <Download className="w-4 h-4" />
-              </div>
-              <h3 className="text-sm font-bold text-zinc-950">즉시 PDF 다운로드 & 백업</h3>
-              <p className="text-xs text-zinc-500 leading-relaxed">
-                원클릭 `.pdf` 파일 즉시 다운로드, 클린 벡터 PDF 인쇄, `.maxcv.json` 데이터 백업 및 공유 링크 생성을 제공합니다.
-              </p>
             </div>
           </div>
         </section>
