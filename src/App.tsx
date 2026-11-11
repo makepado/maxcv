@@ -26,6 +26,7 @@ import { CVPreviewCanvas } from './components/CVPreviewCanvas';
 import { GoogleAuthModal } from './components/GoogleAuthModal';
 import { LandingPage } from './components/LandingPage';
 import { SAMPLE_CVS } from './constants/defaultCv';
+import { createBlankCareerDoc, SAMPLE_CAREERS } from './constants/careerSamples';
 import { GoogleUserProfile } from './types/cv';
 import { downloadResumePdfFile, printVectorPdfClean } from './utils/pdfExport';
 
@@ -182,14 +183,23 @@ export function App() {
 
           <div className="h-4 w-[1px] bg-zinc-200 hidden sm:block" />
 
-          {/* 현재 이력서 제목 인라인 수정 & 이력서 목록 열기 */}
+          {/* 현재 문서 제목 인라인 수정 & 보관함 열기 */}
           <div className="flex items-center gap-1.5 min-w-0">
+            <span
+              className={`hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0 ${
+                activeDoc.docType === 'career'
+                  ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                  : 'bg-zinc-100 text-zinc-700 border border-zinc-200'
+              }`}
+            >
+              {activeDoc.docType === 'career' ? '경력기술서' : '이력서'}
+            </span>
             <input
               type="text"
               value={activeDoc.name}
               onChange={(e) => renameDocument(activeDoc.id, e.target.value)}
               className="text-sm font-bold text-zinc-900 bg-zinc-100/80 hover:bg-zinc-100 focus:bg-white px-2.5 py-1.5 rounded-lg border border-transparent focus:border-zinc-900 outline-none truncate max-w-[160px] sm:max-w-[230px]"
-              title="클릭하여 이력서 제목 변경"
+              title="클릭하여 문서 제목 변경"
             />
             <button
               type="button"
@@ -340,17 +350,17 @@ export function App() {
         }}
       />
 
-      {/* 다중 이력서 관리 드로어 모달 */}
+      {/* 다중 이력서·경력기술서 관리 드로어 모달 */}
       {showDocDrawer && (
         <div className="no-print fixed inset-0 z-50 bg-zinc-950/40 backdrop-blur-xs flex items-start justify-center pt-16 px-4">
           <div className="bg-white rounded-2xl border border-zinc-200 shadow-2xl max-w-2xl w-full p-5 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
               <div>
                 <h2 className="text-base font-bold text-zinc-900">
-                  {currentUser.name} ({currentUser.email}) 님의 이력서 보관함
+                  {currentUser.name} ({currentUser.email}) 님의 문서 보관함
                 </h2>
                 <p className="text-xs text-zinc-500">
-                  직무별·언어별로 여러 개의 이력서를 만들고 Google 계정 단위로 D1에 동기화하세요.
+                  이력서와 경력기술서를 각각 만들고 관리할 수 있습니다.
                 </p>
               </div>
               <button
@@ -362,47 +372,90 @@ export function App() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  createNewDocument();
-                  setShowDocDrawer(false);
-                }}
-                className="p-3 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs flex items-center justify-center gap-1.5"
-              >
-                <Plus className="w-4 h-4" />
-                <span>빈 이력서 새로 만들기</span>
-              </button>
+            <div className="space-y-2">
+              {/* 이력서 생성 버튼 행 */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    createNewDocument();
+                    setShowDocDrawer(false);
+                  }}
+                  className="p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>새 이력서</span>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  createNewDocument(SAMPLE_CVS[0]);
-                  setShowDocDrawer(false);
-                }}
-                className="p-3 rounded-xl border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 font-bold text-xs flex items-center justify-center gap-1.5"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>IT·개발자 샘플 불러오기</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    createNewDocument(SAMPLE_CVS[0], SAMPLE_CVS[0].name);
+                    setShowDocDrawer(false);
+                  }}
+                  className="p-2.5 rounded-xl border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-zinc-500" />
+                  <span>개발자 이력서 샘플</span>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  createNewDocument(SAMPLE_CVS[1]);
-                  setShowDocDrawer(false);
-                }}
-                className="p-3 rounded-xl border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 font-bold text-xs flex items-center justify-center gap-1.5"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>학술·명조 샘플 불러오기</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    createNewDocument(SAMPLE_CVS[1], SAMPLE_CVS[1].name);
+                    setShowDocDrawer(false);
+                  }}
+                  className="p-2.5 rounded-xl border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-zinc-500" />
+                  <span>연구원 이력서 샘플</span>
+                </button>
+              </div>
+
+              {/* 경력기술서 생성 버튼 행 */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    createNewDocument(createBlankCareerDoc(), '새 경력기술서');
+                    setShowDocDrawer(false);
+                  }}
+                  className="p-2.5 rounded-xl bg-indigo-950 hover:bg-indigo-900 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>새 경력기술서</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    createNewDocument(SAMPLE_CAREERS[0], SAMPLE_CAREERS[0].name);
+                    setShowDocDrawer(false);
+                  }}
+                  className="p-2.5 rounded-xl border border-indigo-200/80 bg-indigo-50/50 hover:bg-indigo-100/70 text-indigo-950 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>개발자 경력기술서 샘플</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    createNewDocument(SAMPLE_CAREERS[1], SAMPLE_CAREERS[1].name);
+                    setShowDocDrawer(false);
+                  }}
+                  className="p-2.5 rounded-xl border border-indigo-200/80 bg-indigo-50/50 hover:bg-indigo-100/70 text-indigo-950 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>연구원 경력기술서 샘플</span>
+                </button>
+              </div>
             </div>
 
             <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
               {documents.map((item) => {
                 const isCurrent = item.id === activeDoc.id;
+                const isCareer = item.docType === 'career';
                 return (
                   <div
                     key={item.id}
@@ -420,11 +473,20 @@ export function App() {
                       className="flex-1 min-w-0 cursor-pointer"
                     >
                       <div className="flex items-center gap-2">
+                        <span
+                          className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${
+                            isCareer
+                              ? 'bg-indigo-100 text-indigo-800'
+                              : 'bg-zinc-200/80 text-zinc-700'
+                          }`}
+                        >
+                          {isCareer ? '경력기술서' : '이력서'}
+                        </span>
                         <span className="font-bold text-sm text-zinc-900 truncate">
                           {item.name}
                         </span>
                         {isCurrent && (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-900 text-white">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-900 text-white shrink-0">
                             현재 편집중
                           </span>
                         )}
@@ -440,7 +502,7 @@ export function App() {
                         type="button"
                         onClick={() => duplicateDocument(item.id)}
                         className="p-2 text-zinc-500 hover:text-zinc-900 rounded-lg hover:bg-white"
-                        title="이력서 복제"
+                        title="문서 복제"
                       >
                         <Copy className="w-4 h-4" />
                       </button>
@@ -449,7 +511,7 @@ export function App() {
                           type="button"
                           onClick={() => deleteDocument(item.id)}
                           className="p-2 text-zinc-400 hover:text-rose-600 rounded-lg hover:bg-white"
-                          title="이력서 삭제"
+                          title="문서 삭제"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

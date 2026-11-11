@@ -175,11 +175,14 @@ export interface DesignSettings {
   sidebarTextColor: string;
 }
 
+export type DocType = 'resume' | 'career';
+
 export interface CVDocument {
   id: string;
   name: string;
   updatedAt: string;
   language: 'ko' | 'en';
+  docType?: DocType; // 'resume': 이력서, 'career': 경력기술서 (미지정 시 이력서)
   personal: PersonalDetails;
   sections: CVSection[];
   design: DesignSettings;

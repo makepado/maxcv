@@ -29,7 +29,7 @@ interface CVStoreState {
   setPreviewZoom: (zoom: number) => void;
   getActiveDocument: () => CVDocument;
   selectDocument: (docId: string) => void;
-  createNewDocument: (presetDoc?: CVDocument) => void;
+  createNewDocument: (presetDoc?: CVDocument, nameOverride?: string) => void;
   duplicateDocument: (docId: string) => void;
   deleteDocument: (docId: string) => void;
   renameDocument: (docId: string, name: string) => void;
@@ -89,13 +89,13 @@ export const useCVStore = create<CVStoreState>()(
 
       selectDocument: (docId) => set({ activeDocId: docId }),
 
-      createNewDocument: (presetDoc) => {
+      createNewDocument: (presetDoc, nameOverride) => {
         const newId = generateId('cv');
         const baseDoc: CVDocument = presetDoc
           ? JSON.parse(JSON.stringify(presetDoc))
           : {
               id: newId,
-              name: '새 이력서 (Untitled CV)',
+              name: '새 이력서',
               updatedAt: new Date().toISOString(),
               language: 'ko',
               personal: {
@@ -222,7 +222,10 @@ export const useCVStore = create<CVStoreState>()(
 
         baseDoc.id = newId;
         baseDoc.updatedAt = new Date().toISOString();
-        if (presetDoc) {
+        if (!baseDoc.docType) baseDoc.docType = 'resume';
+        if (nameOverride) {
+          baseDoc.name = nameOverride;
+        } else if (presetDoc) {
           baseDoc.name = `${presetDoc.name} (사본)`;
         }
 
