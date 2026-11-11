@@ -155,8 +155,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             className="mt-6 text-base sm:text-lg text-zinc-500 max-w-xl mx-auto leading-relaxed font-normal"
             style={{ wordBreak: 'keep-all' }}
           >
-            20종의 무료 한국어 폰트와 px 단위 정밀 조판으로
-            어떤 디바이스에서도 완벽한 A4 PDF를 완성하세요.
+            복잡한 편집 없이, 입력하면 그대로 완성되는 이력서
           </p>
 
           {/* 메인 CTA 버튼 영역 */}
