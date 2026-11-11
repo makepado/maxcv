@@ -129,7 +129,7 @@ ${sheetEl.outerHTML}
           </span>
           <h3 className="text-lg font-bold mt-2">PDF 인쇄 및 공유</h3>
           <p className="text-xs text-zinc-300 mt-1 leading-relaxed">
-            텍스트 드래그와 링크 클릭이 살아있는 벡터 PDF 인쇄창을 열거나, 실시간 웹 공유 링크를 생성할 수 있습니다.
+            링크와 텍스트가 살아있는 PDF로 깔끔하게 인쇄하고, 웹 링크로 바로 공유해 보세요.
           </p>
         </div>
 
