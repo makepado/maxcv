@@ -23,6 +23,7 @@ export const DEFAULT_DESIGN_SETTINGS: DesignSettings = {
   headerLayout: 'left',
   headerBgStyle: 'none',
   showHeaderIcons: true,
+  headerSeparator: 'none',
   headingStyle: 'underline-full',
   showSectionIcons: true,
   skillDisplayStyle: 'badge',

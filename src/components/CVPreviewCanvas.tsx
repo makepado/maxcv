@@ -598,74 +598,116 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
             )}
 
             {/* 연락처 및 소셜 링크 */}
-            <div
-              className={`flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-3 ${
-                design.headerLayout === 'center'
-                  ? 'justify-center'
-                  : design.headerLayout === 'right'
-                  ? 'justify-end'
-                  : 'justify-start'
-              }`}
-              style={{
-                color: headerSubCol,
-                fontSize: `${baseFontSizePt * 0.88}pt`,
-              }}
-            >
-              {metaList.map((m, idx) => (
-                <div key={idx} className="cv-header-meta-item inline-flex items-center gap-1.5 leading-none">
-                  {design.showHeaderIcons !== false && (
-                    <span
-                      className="cv-inline-icon inline-flex items-center justify-center shrink-0 leading-none"
-                      style={{ color: iconColor }}
-                    >
-                      {m.icon}
-                    </span>
-                  )}
-                  {m.href ? (
-                    <a href={m.href} className="cv-inline-text hover:underline leading-none">
-                      {m.text}
-                    </a>
-                  ) : (
-                    <span className="cv-inline-text leading-none">{m.text}</span>
-                  )}
-                </div>
-              ))}
+            {(() => {
+              const allHeaderItems: React.ReactNode[] = [];
 
-              {personal.customFields?.map((cf) =>
-                cf.value ? (
-                  <div key={cf.id} className="cv-header-meta-item inline-flex items-center gap-1 leading-none">
-                    <span className="font-semibold leading-none" style={{ color: iconColor }}>
-                      {cf.label}:
-                    </span>
-                    <span className="leading-none">{cf.value}</span>
-                  </div>
-                ) : null
-              )}
-
-              {personal.links.map((link) =>
-                link.label || link.url ? (
-                  <a
-                    key={link.id}
-                    href={link.url || '#'}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="cv-header-meta-item inline-flex items-center gap-1.5 hover:underline font-medium leading-none"
-                  >
+              metaList.forEach((m, idx) => {
+                allHeaderItems.push(
+                  <div key={`meta-${idx}`} className="cv-header-meta-item inline-flex items-center gap-1.5 leading-none">
                     {design.showHeaderIcons !== false && (
                       <span
                         className="cv-inline-icon inline-flex items-center justify-center shrink-0 leading-none"
                         style={{ color: iconColor }}
                       >
-                        {getSocialIcon(link.platform)}
+                        {m.icon}
                       </span>
                     )}
-                    <span className="cv-inline-text leading-none">
-                      {design.linkShowFullUrl && link.url ? link.url : link.label || link.url}
-                    </span>
-                  </a>
-                ) : null
-              )}
-            </div>
+                    {m.href ? (
+                      <a href={m.href} className="cv-inline-text hover:underline leading-none">
+                        {m.text}
+                      </a>
+                    ) : (
+                      <span className="cv-inline-text leading-none">{m.text}</span>
+                    )}
+                  </div>
+                );
+              });
+
+              personal.customFields?.forEach((cf) => {
+                if (cf.value) {
+                  allHeaderItems.push(
+                    <div key={`cf-${cf.id}`} className="cv-header-meta-item inline-flex items-center gap-1 leading-none">
+                      <span className="font-semibold leading-none" style={{ color: iconColor }}>
+                        {cf.label}:
+                      </span>
+                      <span className="leading-none">{cf.value}</span>
+                    </div>
+                  );
+                }
+              });
+
+              personal.links.forEach((link) => {
+                if (link.label || link.url) {
+                  allHeaderItems.push(
+                    <a
+                      key={`link-${link.id}`}
+                      href={link.url || '#'}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="cv-header-meta-item inline-flex items-center gap-1.5 hover:underline font-medium leading-none"
+                    >
+                      {design.showHeaderIcons !== false && (
+                        <span
+                          className="cv-inline-icon inline-flex items-center justify-center shrink-0 leading-none"
+                          style={{ color: iconColor }}
+                        >
+                          {getSocialIcon(link.platform)}
+                        </span>
+                      )}
+                      <span className="cv-inline-text leading-none">
+                        {design.linkShowFullUrl && link.url ? link.url : link.label || link.url}
+                      </span>
+                    </a>
+                  );
+                }
+              });
+
+              const sepChar =
+                design.headerSeparator === 'pipe'
+                  ? '|'
+                  : design.headerSeparator === 'dot'
+                  ? '·'
+                  : design.headerSeparator === 'slash'
+                  ? '/'
+                  : design.headerSeparator === 'bullet'
+                  ? '•'
+                  : null;
+
+              return (
+                <div
+                  className={`flex flex-wrap items-center ${
+                    sepChar ? 'gap-x-2.5 gap-y-1.5' : 'gap-x-4 gap-y-1.5'
+                  } mt-3 ${
+                    design.headerLayout === 'center'
+                      ? 'justify-center'
+                      : design.headerLayout === 'right'
+                      ? 'justify-end'
+                      : 'justify-start'
+                  }`}
+                  style={{
+                    color: headerSubCol,
+                    fontSize: `${baseFontSizePt * 0.88}pt`,
+                  }}
+                >
+                  {allHeaderItems.map((item, index) => (
+                    <React.Fragment key={index}>
+                      {item}
+                      {sepChar && index < allHeaderItems.length - 1 && (
+                        <span
+                          className="select-none opacity-40 font-light leading-none"
+                          style={{
+                            fontSize: `${baseFontSizePt * 0.82}pt`,
+                            color: isSolid ? 'rgba(255,255,255,0.6)' : design.mutedTextColor,
+                          }}
+                        >
+                          {sepChar}
+                        </span>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
 
           {/* 증명사진 / 프로필 이미지 */}

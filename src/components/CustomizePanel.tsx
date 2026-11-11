@@ -363,6 +363,35 @@ export const CustomizePanel: React.FC = () => {
           </div>
         </div>
 
+        {/* 헤더 연락처 구분자 */}
+        <div>
+          <label className="block text-xs font-semibold text-zinc-600 mb-1.5">
+            헤더 정보 구분 기호
+          </label>
+          <div className="grid grid-cols-5 gap-1.5">
+            {[
+              { id: 'none', label: '없음 (공백)' },
+              { id: 'pipe', label: '| (파이프)' },
+              { id: 'dot', label: '· (가운데점)' },
+              { id: 'slash', label: '/ (슬래시)' },
+              { id: 'bullet', label: '• (불릿)' },
+            ].map((sep) => (
+              <button
+                key={sep.id}
+                type="button"
+                onClick={() => updateDesign({ headerSeparator: sep.id as any })}
+                className={`py-1.5 px-2 rounded-xl border text-xs font-semibold transition-all ${
+                  (design.headerSeparator || 'none') === sep.id
+                    ? 'border-zinc-900 bg-zinc-900 text-white'
+                    : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50'
+                }`}
+              >
+                {sep.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* 아이콘 및 표시 옵션 체크박스 */}
         <div className="flex flex-wrap gap-4 pt-2 border-t border-zinc-100">
           <label className="inline-flex items-center gap-2 text-xs font-medium text-zinc-700 cursor-pointer">

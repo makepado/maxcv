@@ -128,6 +128,7 @@ export interface DesignSettings {
   headerLayout: HeaderLayout;
   headerBgStyle: 'none' | 'tinted' | 'solid-accent' | 'bottom-border';
   showHeaderIcons: boolean;
+  headerSeparator: 'none' | 'pipe' | 'dot' | 'slash' | 'bullet';
   headingStyle: HeadingStyle;
   showSectionIcons: boolean;
   skillDisplayStyle: SkillDisplayStyle;
