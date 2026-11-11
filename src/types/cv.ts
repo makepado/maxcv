@@ -108,12 +108,37 @@ export interface DesignSettings {
   headingFontId: string;
   bodyFontId: string;
   monoFontId: string;
-  fontSizeScale: number;       // 0.8 ~ 1.25 (기본 1.0 = 10pt 기준)
-  lineHeight: number;          // 1.25 ~ 1.85 (기본 1.5)
-  letterSpacing: number;       // -0.04 ~ 0.06 em (한글 자간 미세조절)
+  fontSizeScale: number;       // 0.8 ~ 1.25 (전체 기준)
+  lineHeight: number;          // 전체 기본 행간
+  letterSpacing: number;       // 전체 기본 자간 (em)
   headingWeight: 500 | 600 | 700 | 800;
   bodyWeight: 300 | 400 | 500;
   wordBreakKeepAll: boolean;   // 한글 단어 끊김 방지 (word-break: keep-all)
+
+  // 프로필 헤더 개별 타이포그래피 (px, lineHeight, letterSpacing in em)
+  nameFontSizePx?: number;        // 기본 28px
+  nameLineHeight?: number;        // 기본 1.2
+  nameLetterSpacing?: number;     // 기본 -0.02 em
+  jobTitleFontSizePx?: number;    // 기본 16px
+  jobTitleLineHeight?: number;    // 기본 1.3
+  jobTitleLetterSpacing?: number; // 기본 -0.01 em
+  contactFontSizePx?: number;     // 기본 12px
+  contactLineHeight?: number;     // 기본 1.4
+  contactLetterSpacing?: number;  // 기본 0 em
+
+  // 섹션별 개별 타이포그래피 (px, lineHeight, letterSpacing in em)
+  sectionHeaderFontSizePx?: number;    // 기본 16px (섹션 제목: 경력, 학력 등)
+  sectionHeaderLineHeight?: number;    // 기본 1.3
+  sectionHeaderLetterSpacing?: number; // 기본 -0.01 em
+  itemTitleFontSizePx?: number;        // 기본 14px (항목 헤드라인: 회사명, 학교명, 프로젝트명 등)
+  itemTitleLineHeight?: number;        // 기본 1.3
+  itemTitleLetterSpacing?: number;     // 기본 -0.01 em
+  itemDescFontSizePx?: number;         // 기본 12.5px (상세 내용 및 불릿)
+  itemDescLineHeight?: number;         // 기본 1.55
+  itemDescLetterSpacing?: number;      // 기본 0 em
+  tagFontSizePx?: number;              // 기본 11px (태그/키워드)
+  tagLineHeight?: number;              // 기본 1.2
+  tagLetterSpacing?: number;           // 기본 0 em
 
   // 레이아웃 및 여백
   layoutStructure: LayoutStructure;

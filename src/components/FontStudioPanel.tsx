@@ -112,96 +112,460 @@ export const FontStudioPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* 1. 타이포그래피 미세 조절 */}
+      {/* 1. 프로필 헤더 타이포그래피 (이름 / 직무 / 연락처) */}
       <div className="bg-white rounded-2xl border border-zinc-200 p-4 shadow-2xs space-y-4">
-        <h3 className="text-sm font-bold text-zinc-900 flex items-center gap-2">
-          <Sliders className="w-4 h-4 text-zinc-800" />
-          크기 · 행간 · 자간 · 굵기
+        <h3 className="text-sm font-bold text-zinc-900 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Sliders className="w-4 h-4 text-zinc-800" />
+            <span>프로필 헤더 타이포그래피</span>
+          </div>
+          <span className="text-[11px] font-normal text-zinc-500">px 단위 정밀 조절</span>
         </h3>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <div className="flex justify-between text-xs font-semibold text-zinc-600 mb-1">
-              <span>글자 크기</span>
-              <span className="text-zinc-900">{Math.round(design.fontSizeScale * 100)}%</span>
-            </div>
-            <input
-              type="range"
-              min={0.8}
-              max={1.25}
-              step={0.02}
-              value={design.fontSizeScale}
-              onChange={(e) => updateDesign({ fontSizeScale: Number(e.target.value) })}
-              className="w-full accent-zinc-900"
-            />
+        {/* 이름 */}
+        <div className="p-3 bg-zinc-50 rounded-xl space-y-2.5 border border-zinc-100">
+          <div className="text-xs font-bold text-zinc-800 flex items-center justify-between">
+            <span>이름</span>
+            <span className="text-zinc-600 font-mono text-[11px]">
+              {design.nameFontSizePx ?? 26}px · {(design.nameLineHeight ?? 1.2).toFixed(2)}배 · {(design.nameLetterSpacing ?? -0.02).toFixed(2)}em
+            </span>
           </div>
-
-          <div>
-            <div className="flex justify-between text-xs font-semibold text-zinc-600 mb-1">
-              <span>줄간격</span>
-              <span className="text-zinc-900">{design.lineHeight.toFixed(2)}</span>
-            </div>
-            <input
-              type="range"
-              min={1.25}
-              max={1.85}
-              step={0.03}
-              value={design.lineHeight}
-              onChange={(e) => updateDesign({ lineHeight: Number(e.target.value) })}
-              className="w-full accent-zinc-900"
-            />
-          </div>
-
-          <div>
-            <div className="flex justify-between text-xs font-semibold text-zinc-600 mb-1">
-              <span>자간</span>
-              <span className="text-zinc-900">{design.letterSpacing.toFixed(3)}em</span>
-            </div>
-            <input
-              type="range"
-              min={-0.05}
-              max={0.06}
-              step={0.005}
-              value={design.letterSpacing}
-              onChange={(e) => updateDesign({ letterSpacing: Number(e.target.value) })}
-              className="w-full accent-zinc-900"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-zinc-600 mb-1">제목 굵기</label>
-              <select
-                value={design.headingWeight}
-                onChange={(e) =>
-                  updateDesign({
-                    headingWeight: Number(e.target.value) as 500 | 600 | 700 | 800,
-                  })
-                }
-                className="w-full text-xs px-2.5 py-2 rounded-lg border border-zinc-200 bg-zinc-50"
-              >
-                <option value={500}>500</option>
-                <option value={600}>600</option>
-                <option value={700}>700</option>
-                <option value={800}>800</option>
-              </select>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>글자 크기</span>
+                <span className="font-semibold text-zinc-900">{design.nameFontSizePx ?? 26}px</span>
+              </div>
+              <input
+                type="range"
+                min={18}
+                max={40}
+                step={1}
+                value={design.nameFontSizePx ?? 26}
+                onChange={(e) => updateDesign({ nameFontSizePx: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-zinc-600 mb-1">본문 굵기</label>
-              <select
-                value={design.bodyWeight}
-                onChange={(e) =>
-                  updateDesign({
-                    bodyWeight: Number(e.target.value) as 300 | 400 | 500,
-                  })
-                }
-                className="w-full text-xs px-2.5 py-2 rounded-lg border border-zinc-200 bg-zinc-50"
-              >
-                <option value={300}>300</option>
-                <option value={400}>400</option>
-                <option value={500}>500</option>
-              </select>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>줄간격</span>
+                <span className="font-semibold text-zinc-900">{(design.nameLineHeight ?? 1.2).toFixed(2)}</span>
+              </div>
+              <input
+                type="range"
+                min={1.0}
+                max={1.8}
+                step={0.05}
+                value={design.nameLineHeight ?? 1.2}
+                onChange={(e) => updateDesign({ nameLineHeight: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
             </div>
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>자간</span>
+                <span className="font-semibold text-zinc-900">{(design.nameLetterSpacing ?? -0.02).toFixed(2)}em</span>
+              </div>
+              <input
+                type="range"
+                min={-0.08}
+                max={0.06}
+                step={0.01}
+                value={design.nameLetterSpacing ?? -0.02}
+                onChange={(e) => updateDesign({ nameLetterSpacing: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 직무 타이틀 */}
+        <div className="p-3 bg-zinc-50 rounded-xl space-y-2.5 border border-zinc-100">
+          <div className="text-xs font-bold text-zinc-800 flex items-center justify-between">
+            <span>직무</span>
+            <span className="text-zinc-600 font-mono text-[11px]">
+              {design.jobTitleFontSizePx ?? 15}px · {(design.jobTitleLineHeight ?? 1.3).toFixed(2)}배 · {(design.jobTitleLetterSpacing ?? -0.01).toFixed(2)}em
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>글자 크기</span>
+                <span className="font-semibold text-zinc-900">{design.jobTitleFontSizePx ?? 15}px</span>
+              </div>
+              <input
+                type="range"
+                min={12}
+                max={24}
+                step={0.5}
+                value={design.jobTitleFontSizePx ?? 15}
+                onChange={(e) => updateDesign({ jobTitleFontSizePx: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>줄간격</span>
+                <span className="font-semibold text-zinc-900">{(design.jobTitleLineHeight ?? 1.3).toFixed(2)}</span>
+              </div>
+              <input
+                type="range"
+                min={1.0}
+                max={1.8}
+                step={0.05}
+                value={design.jobTitleLineHeight ?? 1.3}
+                onChange={(e) => updateDesign({ jobTitleLineHeight: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>자간</span>
+                <span className="font-semibold text-zinc-900">{(design.jobTitleLetterSpacing ?? -0.01).toFixed(2)}em</span>
+              </div>
+              <input
+                type="range"
+                min={-0.08}
+                max={0.06}
+                step={0.01}
+                value={design.jobTitleLetterSpacing ?? -0.01}
+                onChange={(e) => updateDesign({ jobTitleLetterSpacing: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 연락처 · 링크 헤더 */}
+        <div className="p-3 bg-zinc-50 rounded-xl space-y-2.5 border border-zinc-100">
+          <div className="text-xs font-bold text-zinc-800 flex items-center justify-between">
+            <span>연락처 · 링크</span>
+            <span className="text-zinc-600 font-mono text-[11px]">
+              {design.contactFontSizePx ?? 12}px · {(design.contactLineHeight ?? 1.35).toFixed(2)}배 · {(design.contactLetterSpacing ?? 0).toFixed(2)}em
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>글자 크기</span>
+                <span className="font-semibold text-zinc-900">{design.contactFontSizePx ?? 12}px</span>
+              </div>
+              <input
+                type="range"
+                min={9}
+                max={16}
+                step={0.5}
+                value={design.contactFontSizePx ?? 12}
+                onChange={(e) => updateDesign({ contactFontSizePx: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>줄간격</span>
+                <span className="font-semibold text-zinc-900">{(design.contactLineHeight ?? 1.35).toFixed(2)}</span>
+              </div>
+              <input
+                type="range"
+                min={1.0}
+                max={1.8}
+                step={0.05}
+                value={design.contactLineHeight ?? 1.35}
+                onChange={(e) => updateDesign({ contactLineHeight: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>자간</span>
+                <span className="font-semibold text-zinc-900">{(design.contactLetterSpacing ?? 0).toFixed(2)}em</span>
+              </div>
+              <input
+                type="range"
+                min={-0.08}
+                max={0.06}
+                step={0.01}
+                value={design.contactLetterSpacing ?? 0}
+                onChange={(e) => updateDesign({ contactLetterSpacing: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. 섹션별 타이포그래피 (헤더 / 항목 헤드라인 / 상세내용 / 태그) */}
+      <div className="bg-white rounded-2xl border border-zinc-200 p-4 shadow-2xs space-y-4">
+        <h3 className="text-sm font-bold text-zinc-900 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Sliders className="w-4 h-4 text-zinc-800" />
+            <span>섹션별 타이포그래피</span>
+          </div>
+          <span className="text-[11px] font-normal text-zinc-500">px 단위 정밀 조절</span>
+        </h3>
+
+        {/* 섹션 헤더 (경력, 학력, 프로젝트 등 큰 제목) */}
+        <div className="p-3 bg-zinc-50 rounded-xl space-y-2.5 border border-zinc-100">
+          <div className="text-xs font-bold text-zinc-800 flex items-center justify-between">
+            <span>섹션 헤더</span>
+            <span className="text-zinc-600 font-mono text-[11px]">
+              {design.sectionHeaderFontSizePx ?? 16}px · {(design.sectionHeaderLineHeight ?? 1.25).toFixed(2)}배 · {(design.sectionHeaderLetterSpacing ?? -0.01).toFixed(2)}em
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>글자 크기</span>
+                <span className="font-semibold text-zinc-900">{design.sectionHeaderFontSizePx ?? 16}px</span>
+              </div>
+              <input
+                type="range"
+                min={13}
+                max={24}
+                step={0.5}
+                value={design.sectionHeaderFontSizePx ?? 16}
+                onChange={(e) => updateDesign({ sectionHeaderFontSizePx: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>줄간격</span>
+                <span className="font-semibold text-zinc-900">{(design.sectionHeaderLineHeight ?? 1.25).toFixed(2)}</span>
+              </div>
+              <input
+                type="range"
+                min={1.0}
+                max={1.8}
+                step={0.05}
+                value={design.sectionHeaderLineHeight ?? 1.25}
+                onChange={(e) => updateDesign({ sectionHeaderLineHeight: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>자간</span>
+                <span className="font-semibold text-zinc-900">{(design.sectionHeaderLetterSpacing ?? -0.01).toFixed(2)}em</span>
+              </div>
+              <input
+                type="range"
+                min={-0.08}
+                max={0.06}
+                step={0.01}
+                value={design.sectionHeaderLetterSpacing ?? -0.01}
+                onChange={(e) => updateDesign({ sectionHeaderLetterSpacing: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 섹션 항목 헤드라인 (회사명, 학교명, 프로젝트명 등) */}
+        <div className="p-3 bg-zinc-50 rounded-xl space-y-2.5 border border-zinc-100">
+          <div className="text-xs font-bold text-zinc-800 flex items-center justify-between">
+            <span>섹션 헤드라인</span>
+            <span className="text-zinc-600 font-mono text-[11px]">
+              {design.itemTitleFontSizePx ?? 14}px · {(design.itemTitleLineHeight ?? 1.3).toFixed(2)}배 · {(design.itemTitleLetterSpacing ?? -0.01).toFixed(2)}em
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>글자 크기</span>
+                <span className="font-semibold text-zinc-900">{design.itemTitleFontSizePx ?? 14}px</span>
+              </div>
+              <input
+                type="range"
+                min={11}
+                max={20}
+                step={0.5}
+                value={design.itemTitleFontSizePx ?? 14}
+                onChange={(e) => updateDesign({ itemTitleFontSizePx: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>줄간격</span>
+                <span className="font-semibold text-zinc-900">{(design.itemTitleLineHeight ?? 1.3).toFixed(2)}</span>
+              </div>
+              <input
+                type="range"
+                min={1.0}
+                max={1.8}
+                step={0.05}
+                value={design.itemTitleLineHeight ?? 1.3}
+                onChange={(e) => updateDesign({ itemTitleLineHeight: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>자간</span>
+                <span className="font-semibold text-zinc-900">{(design.itemTitleLetterSpacing ?? -0.01).toFixed(2)}em</span>
+              </div>
+              <input
+                type="range"
+                min={-0.08}
+                max={0.06}
+                step={0.01}
+                value={design.itemTitleLetterSpacing ?? -0.01}
+                onChange={(e) => updateDesign({ itemTitleLetterSpacing: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 섹션 상세 내용 (불릿 포인트 및 본문 설명) */}
+        <div className="p-3 bg-zinc-50 rounded-xl space-y-2.5 border border-zinc-100">
+          <div className="text-xs font-bold text-zinc-800 flex items-center justify-between">
+            <span>섹션 상세내용</span>
+            <span className="text-zinc-600 font-mono text-[11px]">
+              {design.itemDescFontSizePx ?? 12.5}px · {(design.itemDescLineHeight ?? 1.55).toFixed(2)}배 · {(design.itemDescLetterSpacing ?? 0).toFixed(2)}em
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>글자 크기</span>
+                <span className="font-semibold text-zinc-900">{design.itemDescFontSizePx ?? 12.5}px</span>
+              </div>
+              <input
+                type="range"
+                min={9.5}
+                max={16}
+                step={0.5}
+                value={design.itemDescFontSizePx ?? 12.5}
+                onChange={(e) => updateDesign({ itemDescFontSizePx: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>줄간격</span>
+                <span className="font-semibold text-zinc-900">{(design.itemDescLineHeight ?? 1.55).toFixed(2)}</span>
+              </div>
+              <input
+                type="range"
+                min={1.1}
+                max={2.0}
+                step={0.05}
+                value={design.itemDescLineHeight ?? 1.55}
+                onChange={(e) => updateDesign({ itemDescLineHeight: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>자간</span>
+                <span className="font-semibold text-zinc-900">{(design.itemDescLetterSpacing ?? 0).toFixed(2)}em</span>
+              </div>
+              <input
+                type="range"
+                min={-0.08}
+                max={0.06}
+                step={0.01}
+                value={design.itemDescLetterSpacing ?? 0}
+                onChange={(e) => updateDesign({ itemDescLetterSpacing: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 섹션 내 태그 (기술 스택 태그 및 칩) */}
+        <div className="p-3 bg-zinc-50 rounded-xl space-y-2.5 border border-zinc-100">
+          <div className="text-xs font-bold text-zinc-800 flex items-center justify-between">
+            <span>섹션 내 태그</span>
+            <span className="text-zinc-600 font-mono text-[11px]">
+              {design.tagFontSizePx ?? 11}px · {(design.tagLineHeight ?? 1.2).toFixed(2)}배 · {(design.tagLetterSpacing ?? 0).toFixed(2)}em
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>글자 크기</span>
+                <span className="font-semibold text-zinc-900">{design.tagFontSizePx ?? 11}px</span>
+              </div>
+              <input
+                type="range"
+                min={8.5}
+                max={14}
+                step={0.5}
+                value={design.tagFontSizePx ?? 11}
+                onChange={(e) => updateDesign({ tagFontSizePx: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>줄간격</span>
+                <span className="font-semibold text-zinc-900">{(design.tagLineHeight ?? 1.2).toFixed(2)}</span>
+              </div>
+              <input
+                type="range"
+                min={1.0}
+                max={1.8}
+                step={0.05}
+                value={design.tagLineHeight ?? 1.2}
+                onChange={(e) => updateDesign({ tagLineHeight: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+            <div>
+              <div className="flex justify-between text-[11px] text-zinc-600 mb-1">
+                <span>자간</span>
+                <span className="font-semibold text-zinc-900">{(design.tagLetterSpacing ?? 0).toFixed(2)}em</span>
+              </div>
+              <input
+                type="range"
+                min={-0.08}
+                max={0.06}
+                step={0.01}
+                value={design.tagLetterSpacing ?? 0}
+                onChange={(e) => updateDesign({ tagLetterSpacing: Number(e.target.value) })}
+                className="w-full accent-zinc-900"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 폰트 굵기 & 어절 줄바꿈 공통 옵션 */}
+        <div className="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-100">
+          <div>
+            <label className="block text-xs font-semibold text-zinc-600 mb-1">제목 굵기</label>
+            <select
+              value={design.headingWeight}
+              onChange={(e) =>
+                updateDesign({
+                  headingWeight: Number(e.target.value) as 500 | 600 | 700 | 800,
+                })
+              }
+              className="w-full text-xs px-2.5 py-2 rounded-lg border border-zinc-200 bg-zinc-50"
+            >
+              <option value={500}>500</option>
+              <option value={600}>600</option>
+              <option value={700}>700</option>
+              <option value={800}>800</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-zinc-600 mb-1">본문 굵기</label>
+            <select
+              value={design.bodyWeight}
+              onChange={(e) =>
+                updateDesign({
+                  bodyWeight: Number(e.target.value) as 300 | 400 | 500,
+                })
+              }
+              className="w-full text-xs px-2.5 py-2 rounded-lg border border-zinc-200 bg-zinc-50"
+            >
+              <option value={300}>300</option>
+              <option value={400}>400</option>
+              <option value={500}>500</option>
+            </select>
           </div>
         </div>
 
@@ -212,7 +576,7 @@ export const FontStudioPanel: React.FC = () => {
             onChange={(e) => updateDesign({ wordBreakKeepAll: e.target.checked })}
             className="rounded text-zinc-900"
           />
-          <span>한글 어절 단위 줄바꿈 유지</span>
+          <span>한글 어절 단위 줄바꿈 유지 (word-break: keep-all)</span>
         </label>
       </div>
 

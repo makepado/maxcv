@@ -183,11 +183,16 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
     const accent = inSidebar ? design.accentColor : design.accentColor;
     const textCol = inSidebar ? design.sidebarTextColor : design.textColor;
 
+    const secHeadingSizePx = design.sectionHeaderFontSizePx ?? 16;
+    const secHeadingLineHeight = design.sectionHeaderLineHeight ?? 1.25;
+    const secHeadingLetterSpacing = design.sectionHeaderLetterSpacing ?? -0.01;
+
     const baseHeadingStyle: React.CSSProperties = {
       fontFamily: headingFont.cssFamily,
       fontWeight: design.headingWeight,
-      letterSpacing: `${design.letterSpacing}em`,
-      fontSize: `${baseFontSizePt * 1.18}pt`,
+      letterSpacing: `${secHeadingLetterSpacing}em`,
+      fontSize: `${secHeadingSizePx}px`,
+      lineHeight: secHeadingLineHeight,
     };
 
     if (design.headingStyle === 'underline-full') {
@@ -302,6 +307,11 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
     const style = design.skillDisplayStyle;
     const accent = design.accentColor;
 
+    const itemTitleSizePx = design.itemTitleFontSizePx ?? 14;
+    const tagSizePx = design.tagFontSizePx ?? 11;
+    const tagLineHeight = design.tagLineHeight ?? 1.2;
+    const tagLetterSpacing = design.tagLetterSpacing ?? 0;
+
     return (
       <div key={item.id} className="cv-entry-item">
         <div className="flex items-baseline justify-between gap-2">
@@ -310,7 +320,9 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
               style={{
                 fontFamily: headingFont.cssFamily,
                 fontWeight: design.headingWeight,
-                fontSize: `${baseFontSizePt * 0.98}pt`,
+                fontSize: `${itemTitleSizePx}px`,
+                lineHeight: design.itemTitleLineHeight ?? 1.3,
+                letterSpacing: `${design.itemTitleLetterSpacing ?? -0.01}em`,
               }}
             >
               {item.title}
@@ -319,7 +331,7 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
           {item.levelText && style !== 'compact-inline' && (
             <span
               className="text-xs opacity-75 shrink-0"
-              style={{ fontSize: `${baseFontSizePt * 0.85}pt` }}
+              style={{ fontSize: `${tagSizePx}px` }}
             >
               {item.levelText}
             </span>
@@ -329,7 +341,7 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
         {item.subtitle && (
           <div
             className="opacity-80 mt-0.5"
-            style={{ fontSize: `${baseFontSizePt * 0.9}pt` }}
+            style={{ fontSize: `${Math.max(tagSizePx, 11.5)}px` }}
           >
             {item.subtitle}
           </div>
@@ -368,7 +380,15 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
           <div className="flex flex-wrap gap-1 mt-1.5">
             {item.tags.map((tag, idx) =>
               style === 'text-only' || style === 'compact-inline' ? (
-                <span key={idx} className="opacity-90">
+                <span
+                  key={idx}
+                  className="opacity-90"
+                  style={{
+                    fontSize: `${tagSizePx}px`,
+                    lineHeight: tagLineHeight,
+                    letterSpacing: `${tagLetterSpacing}em`,
+                  }}
+                >
                   {tag}
                   {idx < item.tags.length - 1 ? ' · ' : ''}
                 </span>
@@ -377,7 +397,9 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
                   key={idx}
                   className="px-2 py-0.5 rounded font-medium"
                   style={{
-                    fontSize: `${baseFontSizePt * 0.84}pt`,
+                    fontSize: `${tagSizePx}px`,
+                    lineHeight: tagLineHeight,
+                    letterSpacing: `${tagLetterSpacing}em`,
                     backgroundColor: inSidebar ? '#ffffff' : `${accent}12`,
                     color: inSidebar ? design.textColor : accent,
                     border: `1px solid ${accent}28`,
@@ -407,6 +429,17 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
     );
 
     const accent = design.accentColor;
+    const itemTitleSizePx = design.itemTitleFontSizePx ?? 14;
+    const itemTitleLineHeight = design.itemTitleLineHeight ?? 1.3;
+    const itemTitleLetterSpacing = design.itemTitleLetterSpacing ?? -0.01;
+
+    const itemDescSizePx = design.itemDescFontSizePx ?? 12.5;
+    const itemDescLineHeight = design.itemDescLineHeight ?? 1.55;
+    const itemDescLetterSpacing = design.itemDescLetterSpacing ?? 0;
+
+    const tagSizePx = design.tagFontSizePx ?? 11;
+    const tagLineHeight = design.tagLineHeight ?? 1.2;
+    const tagLetterSpacing = design.tagLetterSpacing ?? 0;
 
     return (
       <div key={item.id} className="cv-entry-item">
@@ -424,7 +457,9 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
                 style={{
                   fontFamily: headingFont.cssFamily,
                   fontWeight: design.headingWeight,
-                  fontSize: `${baseFontSizePt * 1.05}pt`,
+                  fontSize: `${itemTitleSizePx}px`,
+                  lineHeight: itemTitleLineHeight,
+                  letterSpacing: `${itemTitleLetterSpacing}em`,
                 }}
               >
                 {item.title}
@@ -438,7 +473,7 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
                 className="inline-flex items-center gap-0.5 hover:underline"
                 style={{
                   color: accent,
-                  fontSize: `${baseFontSizePt * 0.86}pt`,
+                  fontSize: `${Math.max(itemTitleSizePx - 2, 11)}px`,
                 }}
               >
                 <ExternalLink className="w-3 h-3" />
@@ -450,7 +485,7 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
           {(dateRange || item.location) && (
             <div
               className="shrink-0 opacity-75 font-medium"
-              style={{ fontSize: `${baseFontSizePt * 0.88}pt` }}
+              style={{ fontSize: `${Math.max(itemTitleSizePx - 2, 11)}px` }}
             >
               {dateRange}
               {dateRange && item.location ? ' | ' : ''}
@@ -465,7 +500,7 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
             className="font-medium mt-0.5"
             style={{
               color: design.mutedTextColor,
-              fontSize: `${baseFontSizePt * 0.95}pt`,
+              fontSize: `${Math.max(itemTitleSizePx - 1, 12)}px`,
             }}
           >
             {item.subtitle}
@@ -475,7 +510,11 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
         {/* 본문 설명 */}
         <div
           className="cv-rich-text opacity-95"
-          style={{ fontSize: `${baseFontSizePt * 0.94}pt` }}
+          style={{
+            fontSize: `${itemDescSizePx}px`,
+            lineHeight: itemDescLineHeight,
+            letterSpacing: `${itemDescLetterSpacing}em`,
+          }}
         >
           {renderFormattedDescription(item.description)}
         </div>
@@ -488,7 +527,9 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
                 key={idx}
                 className="px-1.5 py-0.5 rounded font-medium"
                 style={{
-                  fontSize: `${baseFontSizePt * 0.8}pt`,
+                  fontSize: `${tagSizePx}px`,
+                  lineHeight: tagLineHeight,
+                  letterSpacing: `${tagLetterSpacing}em`,
                   backgroundColor: `${accent}12`,
                   color: accent,
                 }}
@@ -585,12 +626,13 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
                 }`}
               >
                 <h1
-                  className="tracking-tight leading-tight"
+                  className="tracking-tight"
                   style={{
                     fontFamily: headingFont.cssFamily,
                     fontWeight: design.headingWeight,
-                    fontSize: `${baseFontSizePt * 2.15}pt`,
-                    letterSpacing: `${design.letterSpacing}em`,
+                    fontSize: `${design.nameFontSizePx ?? 26}px`,
+                    lineHeight: design.nameLineHeight ?? 1.2,
+                    letterSpacing: `${design.nameLetterSpacing ?? -0.02}em`,
                   }}
                 >
                   {personal.fullName || '이름을 입력하세요'}
@@ -601,7 +643,9 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
                     style={{
                       fontFamily: headingFont.cssFamily,
                       color: isSolid ? '#ffffff' : design.accentColor,
-                      fontSize: `${baseFontSizePt * 1.18}pt`,
+                      fontSize: `${design.jobTitleFontSizePx ?? 15}px`,
+                      lineHeight: design.jobTitleLineHeight ?? 1.3,
+                      letterSpacing: `${design.jobTitleLetterSpacing ?? -0.01}em`,
                     }}
                   >
                     {personal.jobTitle}
@@ -612,12 +656,13 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
               <div className="w-full flex flex-col">
                 <div className={`w-full flex ${getNameAlignClass(effectiveNameAlign)}`}>
                   <h1
-                    className="tracking-tight leading-tight"
+                    className="tracking-tight"
                     style={{
                       fontFamily: headingFont.cssFamily,
                       fontWeight: design.headingWeight,
-                      fontSize: `${baseFontSizePt * 2.15}pt`,
-                      letterSpacing: `${design.letterSpacing}em`,
+                      fontSize: `${design.nameFontSizePx ?? 26}px`,
+                      lineHeight: design.nameLineHeight ?? 1.2,
+                      letterSpacing: `${design.nameLetterSpacing ?? -0.02}em`,
                     }}
                   >
                     {personal.fullName || '이름을 입력하세요'}
@@ -631,7 +676,9 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
                       style={{
                         fontFamily: headingFont.cssFamily,
                         color: isSolid ? '#ffffff' : design.accentColor,
-                        fontSize: `${baseFontSizePt * 1.18}pt`,
+                        fontSize: `${design.jobTitleFontSizePx ?? 15}px`,
+                        lineHeight: design.jobTitleLineHeight ?? 1.3,
+                        letterSpacing: `${design.jobTitleLetterSpacing ?? -0.01}em`,
                       }}
                     >
                       {personal.jobTitle}
@@ -730,7 +777,9 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
                   }`}
                   style={{
                     color: headerSubCol,
-                    fontSize: `${baseFontSizePt * 0.88}pt`,
+                    fontSize: `${design.contactFontSizePx ?? 12}px`,
+                    lineHeight: design.contactLineHeight ?? 1.35,
+                    letterSpacing: `${design.contactLetterSpacing ?? 0}em`,
                   }}
                 >
                   {allHeaderItems.map((item, index) => (
