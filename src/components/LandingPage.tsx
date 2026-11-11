@@ -10,12 +10,60 @@ import {
   ShieldCheck,
   Sliders,
 } from 'lucide-react';
+import { useCVStore } from '../store/useCVStore';
+import { DEFAULT_GOOGLE_CLIENT_ID } from './GoogleAuthModal';
+import { GoogleUserProfile } from '../types/cv';
 
 interface LandingPageProps {
   onOpenGoogleLogin: () => void;
+  onDirectLoginSuccess?: (user: GoogleUserProfile) => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onOpenGoogleLogin }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({
+  onOpenGoogleLogin,
+  onDirectLoginSuccess,
+}) => {
+  const googleClientId = useCVStore((s) => s.googleClientId);
+  const setCurrentUser = useCVStore((s) => s.setCurrentUser);
+
+  const handleGoogleLoginClick = () => {
+    const activeClientId =
+      googleClientId ||
+      (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID ||
+      DEFAULT_GOOGLE_CLIENT_ID;
+
+    if ((window as any).google?.accounts?.oauth2 && activeClientId) {
+      try {
+        const client = (window as any).google.accounts.oauth2.initTokenClient({
+          client_id: activeClientId,
+          scope: 'openid email profile',
+          callback: async (tokenResponse: any) => {
+            if (tokenResponse?.access_token) {
+              const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+              });
+              const info = await res.json();
+              if (info?.email) {
+                const profile: GoogleUserProfile = {
+                  email: info.email.toLowerCase(),
+                  name: info.name || info.email.split('@')[0],
+                  picture: info.picture || '',
+                  sub: info.sub || '',
+                };
+                setCurrentUser(profile);
+                onDirectLoginSuccess?.(profile);
+              }
+            }
+          },
+        });
+        client.requestAccessToken({ prompt: 'select_account' });
+        return;
+      } catch {
+        // fallback to modal
+      }
+    }
+    onOpenGoogleLogin();
+  };
   const fontShowcase = [
     {
       category: 'SANS-SERIF · 본문 고딕',
@@ -67,7 +115,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenGoogleLogin }) =
             </a>
             <button
               type="button"
-              onClick={onOpenGoogleLogin}
+              onClick={handleGoogleLoginClick}
               className="px-4 py-2 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-xs cursor-pointer"
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
@@ -124,7 +172,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenGoogleLogin }) =
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3.5">
             <button
               type="button"
-              onClick={onOpenGoogleLogin}
+              onClick={handleGoogleLoginClick}
               className="w-full sm:w-auto px-7 py-4 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-sm shadow-xl shadow-zinc-950/10 flex items-center justify-center gap-3 transition-all cursor-pointer group"
             >
               <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0">
@@ -278,7 +326,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenGoogleLogin }) =
                   </span>
                   <button
                     type="button"
-                    onClick={onOpenGoogleLogin}
+                    onClick={handleGoogleLoginClick}
                     className="text-xs font-bold text-zinc-950 hover:underline flex items-center gap-1 cursor-pointer"
                   >
                     <span>내 이력서 만들기</span>

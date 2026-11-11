@@ -136,7 +136,12 @@ export function App() {
   if (!currentUser) {
     return (
       <>
-        <LandingPage onOpenGoogleLogin={() => setShowAuthModal(true)} />
+        <LandingPage
+          onOpenGoogleLogin={() => setShowAuthModal(true)}
+          onDirectLoginSuccess={(user) => {
+            syncUserAccountResumes(user);
+          }}
+        />
         <GoogleAuthModal
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
@@ -216,7 +221,7 @@ export function App() {
           ))}
         </nav>
 
-        {/* 우측: Google 계정 상태 + D1 저장 + PDF 다운로드 + 로그아웃 */}
+        {/* 우측: Google 계정 상태 + D1 세이브포인트 저장 + 프린트 아이콘 + 로그아웃 */}
         <div className="flex items-center gap-2 shrink-0">
           <button
             type="button"
@@ -249,12 +254,12 @@ export function App() {
             type="button"
             onClick={handleQuickSaveD1}
             className="px-3 py-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 flex items-center gap-1.5 transition-all"
-            title={`${currentUser.email} 계정의 Cloudflare D1에 즉시 저장`}
+            title={`${currentUser.email} 계정의 Cloudflare D1 데이터베이스에 현재 상태를 저장합니다`}
           >
             {quickSaved ? (
               <>
                 <Check className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="text-emerald-700">저장됨</span>
+                <span className="text-emerald-700">D1 저장됨</span>
               </>
             ) : (
               <>
@@ -266,29 +271,9 @@ export function App() {
 
           <button
             type="button"
-            disabled={pdfDownloading}
-            onClick={async () => {
-              setPdfDownloading(true);
-              try {
-                await downloadResumePdfFile(activeDoc);
-              } catch {
-                printVectorPdfClean(activeDoc);
-              } finally {
-                setPdfDownloading(false);
-              }
-            }}
-            className="px-3.5 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 disabled:opacity-60 text-white text-xs font-bold flex items-center gap-1.5 transition-all"
-            title="클릭 시 즉시 .pdf 파일로 다운로드합니다"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>{pdfDownloading ? 'PDF 생성중...' : 'PDF 다운로드'}</span>
-          </button>
-
-          <button
-            type="button"
             onClick={() => printVectorPdfClean(activeDoc)}
-            className="p-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-600 text-xs font-bold hidden sm:flex items-center justify-center"
-            title="브라우저 벡터 PDF 인쇄창 열기"
+            className="p-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold flex items-center justify-center transition-all shadow-xs"
+            title="인쇄 / PDF로 저장하기"
           >
             <Printer className="w-4 h-4" />
           </button>
