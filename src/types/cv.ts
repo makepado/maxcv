@@ -106,6 +106,7 @@ export type HeadingStyle = 'underline-full' | 'underline-accent' | 'left-bar' | 
 export type SkillDisplayStyle = 'bars' | 'dots' | 'badge' | 'text-only' | 'compact-inline';
 export type DatePositionStyle = 'right' | 'below-title' | 'inline';
 export type DateFormatStyle = 'dot' | 'korean' | 'slash' | 'english';
+export type BulletStyle = 'bullet' | 'dash' | 'number' | 'square' | 'none';
 
 export interface DesignSettings {
   templatePresetId: string;
@@ -166,6 +167,7 @@ export interface DesignSettings {
   headingStyle: HeadingStyle;
   showSectionIcons: boolean;
   skillDisplayStyle: SkillDisplayStyle;
+  bulletStyle?: BulletStyle;
   datePosition: DatePositionStyle;
   dateFormat: DateFormatStyle;
   linkShowFullUrl: boolean;

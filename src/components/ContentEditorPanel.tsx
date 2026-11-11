@@ -112,14 +112,13 @@ export const ContentEditorPanel: React.FC = () => {
     });
   };
 
-  // 엔터(Enter) 키 입력 시 다음 줄에 자동으로 `• ` 불릿을 삽입
+  // 엔터(Enter) 키 입력 시 현재 줄이 불릿으로 시작하는 경우에만 다음 줄에 불릿을 자동 삽입
   const handleDescriptionKeyDown = (
     e: React.KeyboardEvent<HTMLTextAreaElement>,
     sectionId: string,
     item: SectionItem
   ) => {
     if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
-      e.preventDefault();
       const target = e.currentTarget;
       const start = target.selectionStart;
       const end = target.selectionEnd;
@@ -127,21 +126,48 @@ export const ContentEditorPanel: React.FC = () => {
       const before = val.slice(0, start);
       const after = val.slice(end);
 
-      // 첫 줄에 아직 불릿이 없다면 첫 줄 앞에도 불릿 보정
-      const normalizedBefore =
-        before.trim().length > 0 && !before.trimStart().startsWith('•') && !before.includes('\n')
-          ? `• ${before}`
-          : before;
+      const lineStart = before.lastIndexOf('\n') + 1;
+      const currentLine = before.slice(lineStart);
 
-      const diff = normalizedBefore.length - before.length;
-      const nextVal = `${normalizedBefore}\n• ${after}`;
-      updateSectionItem(sectionId, item.id, { description: nextVal });
+      // 현재 줄이 불릿 기호(•, -, –, ▪, *, 1. 등)로 시작하는지 검사
+      const bulletMatch = currentLine.match(/^(\s*)([•\-–▪*]|\d+\.)(\s*)/);
 
-      requestAnimationFrame(() => {
-        const nextCursor = start + diff + 3;
-        target.selectionStart = nextCursor;
-        target.selectionEnd = nextCursor;
-      });
+      if (bulletMatch) {
+        e.preventDefault();
+        const [fullBullet, indent, bulletSymbol] = bulletMatch;
+        const lineContentAfterBullet = currentLine.slice(fullBullet.length);
+
+        // 불릿 기호만 있고 내용이 없는 빈 불릿 줄에서 엔터를 치면 불릿을 제거하고 일반 줄바꿈
+        if (!lineContentAfterBullet.trim()) {
+          const textBeforeLine = before.slice(0, lineStart);
+          const nextVal = `${textBeforeLine}${after}`;
+          updateSectionItem(sectionId, item.id, { description: nextVal });
+
+          requestAnimationFrame(() => {
+            target.selectionStart = lineStart;
+            target.selectionEnd = lineStart;
+          });
+          return;
+        }
+
+        // 숫자인 경우 번호 1 증가, 아니면 동일 기호 유지
+        let nextBullet = `${indent}${bulletSymbol} `;
+        const numMatch = bulletSymbol.match(/^(\d+)\.$/);
+        if (numMatch) {
+          const nextNum = parseInt(numMatch[1], 10) + 1;
+          nextBullet = `${indent}${nextNum}. `;
+        }
+
+        const nextVal = `${before}\n${nextBullet}${after}`;
+        updateSectionItem(sectionId, item.id, { description: nextVal });
+
+        requestAnimationFrame(() => {
+          const nextCursor = start + 1 + nextBullet.length;
+          target.selectionStart = nextCursor;
+          target.selectionEnd = nextCursor;
+        });
+      }
+      // 불릿 줄이 아니면 기본 엔터(일반 줄바꿈)가 브라우저 기본 동작으로 처리됨
     }
   };
 
@@ -502,7 +528,7 @@ export const ContentEditorPanel: React.FC = () => {
 
                         <div>
                           <label className="block text-[11px] font-medium text-zinc-500 mb-1">
-                            위치 / 학점
+                            {section.type === 'education' ? '학점' : '위치'}
                           </label>
                           <input
                             type="text"
@@ -510,7 +536,11 @@ export const ContentEditorPanel: React.FC = () => {
                             onChange={(e) =>
                               updateSectionItem(section.id, item.id, { location: e.target.value })
                             }
-                            placeholder={meta.locationPlaceholder || '서울'}
+                            placeholder={
+                              section.type === 'education'
+                                ? '학점 (예: 4.12 / 4.5)'
+                                : (meta.locationPlaceholder || '서울')
+                            }
                             className="w-full text-sm px-2.5 py-1.5 rounded-lg bg-white border border-zinc-200 focus:border-zinc-900 outline-none"
                           />
                         </div>
@@ -636,7 +666,7 @@ export const ContentEditorPanel: React.FC = () => {
                               description: e.target.value,
                             })
                           }
-                          placeholder="• 주요 성과 입력 (Enter 입력 시 다음 줄 불릿 자동 생성)"
+                          placeholder="• 주요 내용 입력 (불릿 줄에서 Enter 입력 시 다음 줄 불릿 자동 생성)"
                           className={`w-full text-sm px-3 py-2 rounded-lg border focus:border-zinc-900 outline-none leading-relaxed ${
                             item.hideDescription || section.hideItemDescription
                               ? 'bg-zinc-100/80 text-zinc-400 border-zinc-200'

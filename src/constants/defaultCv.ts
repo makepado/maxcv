@@ -54,6 +54,7 @@ export const DEFAULT_DESIGN_SETTINGS: DesignSettings = {
   headingStyle: 'underline-full',
   showSectionIcons: true,
   skillDisplayStyle: 'badge',
+  bulletStyle: 'bullet',
   datePosition: 'right',
   dateFormat: 'dot',
   linkShowFullUrl: false,
@@ -117,7 +118,7 @@ export const SECTION_CATALOG: SectionMetadata[] = [
     defaultColumn: 'main',
     titlePlaceholder: '학교명',
     subtitlePlaceholder: '전공 및 학위',
-    locationPlaceholder: '학점 / 소재지',
+    locationPlaceholder: '학점 (예: 4.12 / 4.5)',
   },
   {
     type: 'skills',

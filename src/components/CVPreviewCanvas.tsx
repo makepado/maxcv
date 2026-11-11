@@ -27,6 +27,7 @@ import {
   Layers,
 } from 'lucide-react';
 import {
+  BulletStyle,
   CVDocument,
   CVSection,
   DesignSettings,
@@ -133,9 +134,11 @@ function getSocialIcon(platform: SocialLink['platform']) {
   }
 }
 
-function renderFormattedDescription(text: string) {
+function renderFormattedDescription(text: string, bulletStyle: BulletStyle = 'bullet') {
   if (!text || !text.trim()) return null;
   const lines = text.split('\n').filter((l) => l.trim().length > 0);
+
+  let bulletCounter = 0;
 
   return (
     <div className="space-y-1 mt-1">
@@ -144,13 +147,38 @@ function renderFormattedDescription(text: string) {
         const isBullet =
           trimmed.startsWith('•') ||
           trimmed.startsWith('-') ||
-          trimmed.startsWith('*');
-        const cleanText = isBullet ? trimmed.replace(/^[•\-*]\s*/, '') : trimmed;
+          trimmed.startsWith('–') ||
+          trimmed.startsWith('▪') ||
+          trimmed.startsWith('*') ||
+          /^\d+\.\s+/.test(trimmed);
+        const cleanText = isBullet
+          ? trimmed.replace(/^([•\-–▪*]|\d+\.)\s*/, '')
+          : trimmed;
 
         if (isBullet) {
+          bulletCounter++;
+          if (bulletStyle === 'none') {
+            return (
+              <p key={i} className="pl-1">
+                {cleanText}
+              </p>
+            );
+          }
+
+          let bulletChar = '•';
+          if (bulletStyle === 'dash') bulletChar = '–';
+          else if (bulletStyle === 'square') bulletChar = '▪';
+          else if (bulletStyle === 'number') bulletChar = `${bulletCounter}.`;
+
           return (
             <div key={i} className="flex items-start gap-1.5">
-              <span className="select-none opacity-75 mt-[1px]">•</span>
+              <span
+                className={`select-none opacity-75 mt-[1px] shrink-0 ${
+                  bulletStyle === 'number' ? 'font-mono text-[0.9em]' : ''
+                }`}
+              >
+                {bulletChar}
+              </span>
               <span className="flex-1">{cleanText}</span>
             </div>
           );
@@ -527,7 +555,7 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
               letterSpacing: `${itemDescLetterSpacing}em`,
             }}
           >
-            {renderFormattedDescription(item.description)}
+            {renderFormattedDescription(item.description, design.bulletStyle || 'bullet')}
           </div>
         )}
 

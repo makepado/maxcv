@@ -15,6 +15,7 @@ import {
 import { useCVStore } from '../store/useCVStore';
 import { COLOR_PALETTES, TEMPLATE_PRESETS } from '../constants/fonts';
 import {
+  BulletStyle,
   DateFormatStyle,
   DatePositionStyle,
   HeaderLayout,
@@ -64,9 +65,11 @@ export const CustomizePanel: React.FC = () => {
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-zinc-900">{preset.nameKo}</span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700">
-                    {preset.badge}
-                  </span>
+                  {preset.badge ? (
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700">
+                      {preset.badge}
+                    </span>
+                  ) : null}
                 </div>
               </button>
             );
@@ -500,6 +503,35 @@ export const CustomizePanel: React.FC = () => {
                 }`}
               >
                 {sk.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 상세 내용 불릿 스타일 */}
+        <div>
+          <label className="block text-xs font-semibold text-zinc-600 mb-1.5">
+            상세 내용 불릿 스타일
+          </label>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            {[
+              { id: 'bullet', label: '• 원형 불릿' },
+              { id: 'dash', label: '- 대시' },
+              { id: 'number', label: '1. 숫자' },
+              { id: 'square', label: '▪ 사각 불릿' },
+              { id: 'none', label: '없음 (들여쓰기)' },
+            ].map((bs) => (
+              <button
+                key={bs.id}
+                type="button"
+                onClick={() => updateDesign({ bulletStyle: bs.id as BulletStyle })}
+                className={`py-2 px-2 rounded-xl border text-xs font-semibold transition-all ${
+                  (design.bulletStyle || 'bullet') === bs.id
+                    ? 'border-zinc-900 bg-zinc-900 text-white'
+                    : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50'
+                }`}
+              >
+                {bs.label}
               </button>
             ))}
           </div>

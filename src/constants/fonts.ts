@@ -279,7 +279,7 @@ export interface TemplatePreset {
 export const TEMPLATE_PRESETS: TemplatePreset[] = [
   {
     id: 'modern-standard',
-    nameKo: '모던 스탠다드',
+    nameKo: '기본',
     nameEn: 'Modern Standard',
     badge: '기본',
     description: '정돈된 1단 레이아웃과 전체 밑줄 구분선, 인디고 포인트',
@@ -298,9 +298,9 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
   },
   {
     id: 'classic-serif',
-    nameKo: '클래식 에디토리얼',
+    nameKo: '클래식',
     nameEn: 'Classic Editorial',
-    badge: '정통',
+    badge: '',
     description: '중앙 정렬 헤더와 하단 보더, 차분한 슬레이트 다크 톤',
     designPatch: {
       templatePresetId: 'classic-serif',
@@ -317,9 +317,9 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
   },
   {
     id: 'sidebar-pro',
-    nameKo: '사이드바 프로',
+    nameKo: '사이드바',
     nameEn: 'Sidebar Pro',
-    badge: '2단 좌측',
+    badge: '',
     description: '좌측 사이드바 분할로 한 페이지 정보 밀도를 높인 구성',
     designPatch: {
       templatePresetId: 'sidebar-pro',
@@ -339,9 +339,9 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
   },
   {
     id: 'tech-developer',
-    nameKo: '테크 엔지니어',
+    nameKo: '스퀘어',
     nameEn: 'Tech Developer',
-    badge: '모던 바',
+    badge: '',
     description: '소프트 틴트 헤더와 좌측 포인트 바를 적용한 깔끔한 구조',
     designPatch: {
       templatePresetId: 'tech-developer',
@@ -358,9 +358,9 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
   },
   {
     id: 'academic-kopub',
-    nameKo: '아카데믹 리서치',
+    nameKo: '리서치',
     nameEn: 'Academic CV',
-    badge: '학술·연구',
+    badge: '',
     description: '미니멀 라인 헤딩과 콤팩트 스킬 구성을 갖춘 연구직 레이아웃',
     designPatch: {
       templatePresetId: 'academic-kopub',
@@ -377,9 +377,9 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
   },
   {
     id: 'creative-bold',
-    nameKo: '크리에이티브 스플릿',
+    nameKo: '크리에이터',
     nameEn: 'Creative Split',
-    badge: '2단 우측',
+    badge: '',
     description: '우측 사이드바와 포인트 컬러 헤더 박스를 결합한 레이아웃',
     designPatch: {
       templatePresetId: 'creative-bold',
