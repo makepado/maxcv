@@ -157,15 +157,20 @@ export function App() {
     <div className="min-h-screen flex flex-col bg-[#fafafa] text-zinc-900">
       {/* 상단 글로벌 네비게이션 바 (인쇄 시 숨김) */}
       <header className="no-print sticky top-0 z-30 h-15 bg-white/95 backdrop-blur border-b border-zinc-200/90 px-4 py-2.5 flex items-center justify-between gap-3">
-        {/* 브랜드 로고 & 현재 문서 이름 */}
+        {/* 브랜드 로고 (클릭 시 기본 콘텐츠 탭으로 이동) & 현재 문서 이름 */}
         <div className="flex items-center gap-3 min-w-0">
-          <div className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-zinc-950 text-white font-black text-sm flex items-center justify-center">
+          <button
+            type="button"
+            onClick={() => setActiveTab('content')}
+            className="flex items-center gap-2 shrink-0 group text-left cursor-pointer"
+            title="홈(콘텐츠 탭)으로 이동"
+          >
+            <div className="w-8 h-8 rounded-lg bg-zinc-950 group-hover:bg-zinc-800 text-white font-black text-sm flex items-center justify-center transition-colors">
               M
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-base tracking-tight text-zinc-950">
+                <span className="font-extrabold text-base tracking-tight text-zinc-950 group-hover:text-zinc-700 transition-colors">
                   MaxCV
                 </span>
                 <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200">
@@ -173,7 +178,7 @@ export function App() {
                 </span>
               </div>
             </div>
-          </div>
+          </button>
 
           <div className="h-4 w-[1px] bg-zinc-200 hidden sm:block" />
 
@@ -221,7 +226,7 @@ export function App() {
           ))}
         </nav>
 
-        {/* 우측: Google 계정 상태 + D1 세이브포인트 저장 + 프린트 아이콘 + 로그아웃 */}
+        {/* 우측: Google 계정 상태 + 저장 버튼 + 프린트 아이콘 + 로그아웃 */}
         <div className="flex items-center gap-2 shrink-0">
           <button
             type="button"
@@ -254,12 +259,12 @@ export function App() {
             type="button"
             onClick={handleQuickSaveD1}
             className="px-3 py-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 flex items-center gap-1.5 transition-all"
-            title={`${currentUser.email} 계정의 Cloudflare D1 데이터베이스에 현재 상태를 저장합니다`}
+            title={`${currentUser.email} 계정 클라우드에 현재 상태를 저장합니다`}
           >
             {quickSaved ? (
               <>
                 <Check className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="text-emerald-700">D1 저장됨</span>
+                <span className="text-emerald-700">저장됨</span>
               </>
             ) : (
               <>
