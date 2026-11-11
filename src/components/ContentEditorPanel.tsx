@@ -884,7 +884,7 @@ export const ContentEditorPanel: React.FC = () => {
         {doc.sections.map((sec, idx) => renderSectionEditor(sec, idx))}
       </div>
 
-      {/* 3. FlowCV 스타일 새 섹션 추가 버튼 및 모달 그리드 */}
+      {/* 3. 새 섹션 추가 버튼 및 모달 그리드 */}
       <div className="pt-2">
         <button
           type="button"

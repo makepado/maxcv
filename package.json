@@ -2,7 +2,7 @@
   "name": "maxcv",
   "private": false,
   "version": "1.0.0",
-  "description": "MaxCV - 한국어 무료 폰트 특화 올인원 이력서/CV 웹 빌더 (FlowCV 클론)",
+  "description": "MaxCV - 한국어 타이포그래피 특화 올인원 이력서/CV 클라우드 스튜디오",
   "type": "module",
   "scripts": {
     "dev": "vite",

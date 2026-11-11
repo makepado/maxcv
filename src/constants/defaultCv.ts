@@ -1,7 +1,7 @@
 import { CVDocument, DesignSettings, SectionType } from '../types/cv';
 
 export const DEFAULT_DESIGN_SETTINGS: DesignSettings = {
-  templatePresetId: 'modern-flow',
+  templatePresetId: 'modern-standard',
   headingFontId: 'pretendard',
   bodyFontId: 'pretendard',
   monoFontId: 'd2coding',

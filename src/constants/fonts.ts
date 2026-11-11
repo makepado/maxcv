@@ -278,13 +278,13 @@ export interface TemplatePreset {
 
 export const TEMPLATE_PRESETS: TemplatePreset[] = [
   {
-    id: 'modern-flow',
-    nameKo: '모던 플로우 (Flow Standard)',
-    nameEn: 'Modern Flow',
+    id: 'modern-standard',
+    nameKo: '모던 스탠다드 (Max Standard)',
+    nameEn: 'Modern Standard',
     badge: '인기 1위',
-    description: 'FlowCV 특유의 깔끔한 1단 구조와 프리텐다드 고딕, 세련된 인디고 포인트',
+    description: '가장 정돈된 1단 그리드 구조와 프리텐다드 고딕, 절제된 인디고 포인트',
     designPatch: {
-      templatePresetId: 'modern-flow',
+      templatePresetId: 'modern-standard',
       headingFontId: 'pretendard',
       bodyFontId: 'pretendard',
       layoutStructure: 'single',

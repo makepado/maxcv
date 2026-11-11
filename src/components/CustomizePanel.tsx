@@ -36,7 +36,7 @@ export const CustomizePanel: React.FC = () => {
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-indigo-600" />
-            원클릭 디자인 프리셋 (FlowCV Templates)
+            원클릭 디자인 프리셋 (MaxCV Templates)
           </h3>
           <button
             type="button"
