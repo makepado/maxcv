@@ -235,18 +235,76 @@ export const ContentEditorPanel: React.FC = () => {
         {/* 섹션 내부 편집 폼 */}
         {isOpen && (
           <div className="px-4 pb-4 pt-2 border-t border-zinc-100 space-y-4">
-            {/* 섹션 제목 변경 */}
-            <div className="flex items-center gap-2">
-              <label className="text-xs font-semibold text-zinc-500 w-20 shrink-0">
-                섹션 제목
-              </label>
-              <input
-                type="text"
-                value={section.title}
-                onChange={(e) => updateSection(section.id, { title: e.target.value })}
-                className="flex-1 text-sm px-3 py-1.5 rounded-lg border border-zinc-200 focus:border-zinc-900 outline-none"
-                placeholder="섹션 제목"
-              />
+            {/* 섹션 제목 및 요소별 숨김 / 표시 토글 옵션 */}
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-semibold text-zinc-500 w-20 shrink-0">
+                  섹션 제목
+                </label>
+                <input
+                  type="text"
+                  value={section.title}
+                  onChange={(e) => updateSection(section.id, { title: e.target.value })}
+                  className="flex-1 text-sm px-3 py-1.5 rounded-lg border border-zinc-200 focus:border-zinc-900 outline-none"
+                  placeholder="섹션 제목 (비우거나 숨기면 아랫줄과 아이콘도 숨겨집니다)"
+                />
+              </div>
+
+              {/* 요소별 숨김 / 숨김해제 빠른 토글 바 */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-1.5 border-t border-zinc-100">
+                <span className="text-[11px] font-semibold text-zinc-400 mr-1">요소 노출:</span>
+
+                {/* 섹션 제목 숨김/표시 */}
+                <button
+                  type="button"
+                  onClick={() => updateSection(section.id, { hideTitle: !section.hideTitle })}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 border transition-all ${
+                    !section.hideTitle
+                      ? 'bg-zinc-900 text-white border-zinc-900 shadow-2xs'
+                      : 'bg-zinc-100 text-zinc-400 border-zinc-200 line-through'
+                  }`}
+                  title={!section.hideTitle ? '섹션 제목 숨기기' : '섹션 제목 표시하기'}
+                >
+                  {!section.hideTitle ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                  <span>섹션 제목</span>
+                </button>
+
+                {/* 헤드라인 숨김/표시 */}
+                <button
+                  type="button"
+                  onClick={() => updateSection(section.id, { hideItemTitle: !section.hideItemTitle })}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 border transition-all ${
+                    !section.hideItemTitle
+                      ? 'bg-zinc-900 text-white border-zinc-900 shadow-2xs'
+                      : 'bg-zinc-100 text-zinc-400 border-zinc-200 line-through'
+                  }`}
+                  title={!section.hideItemTitle ? '헤드라인 전체 숨기기' : '헤드라인 전체 표시하기'}
+                >
+                  {!section.hideItemTitle ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                  <span>헤드라인</span>
+                </button>
+
+                {/* 상세내용 숨김/표시 */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    updateSection(section.id, { hideItemDescription: !section.hideItemDescription })
+                  }
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 border transition-all ${
+                    !section.hideItemDescription
+                      ? 'bg-zinc-900 text-white border-zinc-900 shadow-2xs'
+                      : 'bg-zinc-100 text-zinc-400 border-zinc-200 line-through'
+                  }`}
+                  title={!section.hideItemDescription ? '상세내용 전체 숨기기' : '상세내용 전체 표시하기'}
+                >
+                  {!section.hideItemDescription ? (
+                    <Eye className="w-3.5 h-3.5" />
+                  ) : (
+                    <EyeOff className="w-3.5 h-3.5" />
+                  )}
+                  <span>상세내용</span>
+                </button>
+              </div>
             </div>
 
             {/* 각 항목 리스트 */}
@@ -320,17 +378,43 @@ export const ContentEditorPanel: React.FC = () => {
                   {/* 항목 입력 필드 */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div className={section.type === 'profile' ? 'sm:col-span-2' : ''}>
-                      <label className="block text-[11px] font-medium text-zinc-500 mb-1">
-                        {section.type === 'profile'
-                          ? '헤드라인'
-                          : section.type === 'experience'
-                          ? '회사명'
-                          : section.type === 'education'
-                          ? '학교명'
-                          : section.type === 'skills'
-                          ? '기술명'
-                          : '제목'}
-                      </label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[11px] font-medium text-zinc-500">
+                          {section.type === 'profile'
+                            ? '헤드라인'
+                            : section.type === 'experience'
+                            ? '회사명'
+                            : section.type === 'education'
+                            ? '학교명'
+                            : section.type === 'skills'
+                            ? '기술명'
+                            : '제목'}
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            updateSectionItem(section.id, item.id, { hideTitle: !item.hideTitle })
+                          }
+                          className={`text-[10px] flex items-center gap-1 font-medium px-1.5 py-0.5 rounded transition-colors ${
+                            item.hideTitle
+                              ? 'text-rose-600 bg-rose-50 border border-rose-200'
+                              : 'text-zinc-500 hover:text-zinc-800'
+                          }`}
+                          title={item.hideTitle ? '헤드라인 표시하기' : '이 항목 헤드라인 숨기기'}
+                        >
+                          {item.hideTitle ? (
+                            <>
+                              <EyeOff className="w-3 h-3 text-rose-500" />
+                              <span className="line-through">헤드라인 숨김</span>
+                            </>
+                          ) : (
+                            <>
+                              <Eye className="w-3 h-3 text-zinc-400" />
+                              <span>표시중</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
                       <input
                         type="text"
                         value={item.title}
@@ -338,7 +422,11 @@ export const ContentEditorPanel: React.FC = () => {
                           updateSectionItem(section.id, item.id, { title: e.target.value })
                         }
                         placeholder={meta.titlePlaceholder}
-                        className="w-full text-sm px-2.5 py-1.5 rounded-lg bg-white border border-zinc-200 focus:border-zinc-900 outline-none"
+                        className={`w-full text-sm px-2.5 py-1.5 rounded-lg border focus:border-zinc-900 outline-none ${
+                          item.hideTitle || section.hideItemTitle
+                            ? 'bg-zinc-100/80 text-zinc-400 border-zinc-200'
+                            : 'bg-white border-zinc-200'
+                        }`}
                       />
                     </div>
 
@@ -497,9 +585,37 @@ export const ContentEditorPanel: React.FC = () => {
                     {section.type !== 'skills' && section.type !== 'languages' && (
                       <div className="sm:col-span-2">
                         <div className="flex items-center justify-between mb-1">
-                          <label className="text-[11px] font-medium text-zinc-500">
-                            상세 내용
-                          </label>
+                          <div className="flex items-center gap-2">
+                            <label className="text-[11px] font-medium text-zinc-500">
+                              상세 내용
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateSectionItem(section.id, item.id, {
+                                  hideDescription: !item.hideDescription,
+                                })
+                              }
+                              className={`text-[10px] flex items-center gap-1 font-medium px-1.5 py-0.5 rounded transition-colors ${
+                                item.hideDescription
+                                  ? 'text-rose-600 bg-rose-50 border border-rose-200'
+                                  : 'text-zinc-500 hover:text-zinc-800'
+                              }`}
+                              title={item.hideDescription ? '상세내용 표시하기' : '이 항목 상세내용 숨기기'}
+                            >
+                              {item.hideDescription ? (
+                                <>
+                                  <EyeOff className="w-3 h-3 text-rose-500" />
+                                  <span className="line-through">상세내용 숨김</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Eye className="w-3 h-3 text-zinc-400" />
+                                  <span>표시중</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
                           <button
                             type="button"
                             onClick={() => {
@@ -521,7 +637,11 @@ export const ContentEditorPanel: React.FC = () => {
                             })
                           }
                           placeholder="• 주요 성과 입력 (Enter 입력 시 다음 줄 불릿 자동 생성)"
-                          className="w-full text-sm px-3 py-2 rounded-lg bg-white border border-zinc-200 focus:border-zinc-900 outline-none leading-relaxed"
+                          className={`w-full text-sm px-3 py-2 rounded-lg border focus:border-zinc-900 outline-none leading-relaxed ${
+                            item.hideDescription || section.hideItemDescription
+                              ? 'bg-zinc-100/80 text-zinc-400 border-zinc-200'
+                              : 'bg-white border-zinc-200'
+                          }`}
                         />
                       </div>
                     )}

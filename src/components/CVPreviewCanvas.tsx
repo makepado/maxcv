@@ -180,7 +180,7 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
       : visibleSections.filter((s) => s.column === 'sidebar');
 
   const renderSectionHeading = (section: CVSection, inSidebar = false) => {
-    if (!section.title || !section.title.trim()) {
+    if (section.hideTitle || !section.title || !section.title.trim()) {
       return null;
     }
 
@@ -307,7 +307,7 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
     );
   };
 
-  const renderSkillItem = (item: SectionItem, inSidebar: boolean) => {
+  const renderSkillItem = (section: CVSection, item: SectionItem, inSidebar: boolean) => {
     const style = design.skillDisplayStyle;
     const accent = design.accentColor;
 
@@ -315,11 +315,12 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
     const tagSizePx = design.tagFontSizePx ?? 11;
     const tagLineHeight = design.tagLineHeight ?? 1.2;
     const tagLetterSpacing = design.tagLetterSpacing ?? 0;
+    const showHeadline = !section.hideItemTitle && !item.hideTitle && Boolean(item.title);
 
     return (
       <div key={item.id} className="cv-entry-item">
         <div className="flex items-baseline justify-between gap-2">
-          {item.title && (
+          {showHeadline && (
             <span
               style={{
                 fontFamily: headingFont.cssFamily,
@@ -421,7 +422,7 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
 
   const renderStandardItem = (section: CVSection, item: SectionItem, inSidebar: boolean) => {
     if (section.type === 'skills' || section.type === 'languages' || section.type === 'interests') {
-      return renderSkillItem(item, inSidebar);
+      return renderSkillItem(section, item, inSidebar);
     }
 
     const dateRange = formatDateRange(
@@ -445,58 +446,63 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
     const tagLineHeight = design.tagLineHeight ?? 1.2;
     const tagLetterSpacing = design.tagLetterSpacing ?? 0;
 
+    const showHeadline = !section.hideItemTitle && !item.hideTitle && Boolean(item.title);
+    const showDescription = !section.hideItemDescription && !item.hideDescription && Boolean(item.description);
+
     return (
       <div key={item.id} className="cv-entry-item">
         {/* 상단 타이틀 + 날짜 라인 */}
-        <div
-          className={`flex ${
-            design.datePosition === 'right' && !inSidebar
-              ? 'items-baseline justify-between gap-3'
-              : 'flex-col'
-          }`}
-        >
-          <div className="flex flex-wrap items-baseline gap-x-2">
-            {item.title && (
-              <h4
-                style={{
-                  fontFamily: headingFont.cssFamily,
-                  fontWeight: design.headingWeight,
-                  fontSize: `${itemTitleSizePx}px`,
-                  lineHeight: itemTitleLineHeight,
-                  letterSpacing: `${itemTitleLetterSpacing}em`,
-                }}
+        {(showHeadline || item.url || dateRange || item.location) && (
+          <div
+            className={`flex ${
+              design.datePosition === 'right' && !inSidebar
+                ? 'items-baseline justify-between gap-3'
+                : 'flex-col'
+            }`}
+          >
+            <div className="flex flex-wrap items-baseline gap-x-2">
+              {showHeadline && (
+                <h4
+                  style={{
+                    fontFamily: headingFont.cssFamily,
+                    fontWeight: design.headingWeight,
+                    fontSize: `${itemTitleSizePx}px`,
+                    lineHeight: itemTitleLineHeight,
+                    letterSpacing: `${itemTitleLetterSpacing}em`,
+                  }}
+                >
+                  {item.title}
+                </h4>
+              )}
+              {item.url && (
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-0.5 hover:underline"
+                  style={{
+                    color: accent,
+                    fontSize: `${Math.max(itemTitleSizePx - 2, 11)}px`,
+                  }}
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  <span>{design.linkShowFullUrl ? item.url : item.urlLabel || '링크'}</span>
+                </a>
+              )}
+            </div>
+
+            {(dateRange || item.location) && (
+              <div
+                className="shrink-0 opacity-75 font-medium"
+                style={{ fontSize: `${Math.max(itemTitleSizePx - 2, 11)}px` }}
               >
-                {item.title}
-              </h4>
-            )}
-            {item.url && (
-              <a
-                href={item.url}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-0.5 hover:underline"
-                style={{
-                  color: accent,
-                  fontSize: `${Math.max(itemTitleSizePx - 2, 11)}px`,
-                }}
-              >
-                <ExternalLink className="w-3 h-3" />
-                <span>{design.linkShowFullUrl ? item.url : item.urlLabel || '링크'}</span>
-              </a>
+                {dateRange}
+                {dateRange && item.location ? ' | ' : ''}
+                {item.location}
+              </div>
             )}
           </div>
-
-          {(dateRange || item.location) && (
-            <div
-              className="shrink-0 opacity-75 font-medium"
-              style={{ fontSize: `${Math.max(itemTitleSizePx - 2, 11)}px` }}
-            >
-              {dateRange}
-              {dateRange && item.location ? ' | ' : ''}
-              {item.location}
-            </div>
-          )}
-        </div>
+        )}
 
         {/* 부제목 (직책, 전공, 기관 등) */}
         {item.subtitle && (
@@ -512,16 +518,18 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
         )}
 
         {/* 본문 설명 */}
-        <div
-          className="cv-rich-text opacity-95"
-          style={{
-            fontSize: `${itemDescSizePx}px`,
-            lineHeight: itemDescLineHeight,
-            letterSpacing: `${itemDescLetterSpacing}em`,
-          }}
-        >
-          {renderFormattedDescription(item.description)}
-        </div>
+        {showDescription && (
+          <div
+            className="cv-rich-text opacity-95"
+            style={{
+              fontSize: `${itemDescSizePx}px`,
+              lineHeight: itemDescLineHeight,
+              letterSpacing: `${itemDescLetterSpacing}em`,
+            }}
+          >
+            {renderFormattedDescription(item.description)}
+          </div>
+        )}
 
         {/* 기술 태그 칩 */}
         {item.tags && item.tags.length > 0 && (

@@ -83,6 +83,8 @@ export interface SectionItem {
   tags: string[];       // 기술 스택 태그, 키워드 목록
   level: number;        // 숙련도 1 ~ 5 (스킬/어학용)
   levelText: string;    // 숙련도 텍스트 (예: Native, Business, JLPT N1, OPIC AL, 고급 등)
+  hideTitle?: boolean;  // 개별 헤드라인 숨김 여부
+  hideDescription?: boolean; // 개별 상세내용 숨김 여부
 }
 
 export interface CVSection {
@@ -93,6 +95,9 @@ export interface CVSection {
   column: 'main' | 'sidebar';
   layoutMode?: 'list' | 'grid-2' | 'grid-3' | 'tags' | 'compact';
   items: SectionItem[];
+  hideTitle?: boolean;           // 섹션 제목 숨김 여부
+  hideItemTitle?: boolean;       // 섹션 내 모든 헤드라인 일괄 숨김 여부
+  hideItemDescription?: boolean; // 섹션 내 모든 상세내용 일괄 숨김 여부
 }
 
 export type LayoutStructure = 'single' | 'two-col-left' | 'two-col-right';
