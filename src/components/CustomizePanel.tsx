@@ -56,19 +56,18 @@ export const CustomizePanel: React.FC = () => {
                 key={preset.id}
                 type="button"
                 onClick={() => updateDesign(preset.designPatch)}
-                className={`p-3.5 rounded-xl border text-left transition-all ${
+                className={`p-3 rounded-xl border text-left transition-all ${
                   isSelected
                     ? 'border-zinc-900 bg-zinc-50 ring-1 ring-zinc-900/10'
                     : 'border-zinc-200 hover:border-zinc-400 hover:bg-zinc-50/50'
                 }`}
               >
-                <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-zinc-900">{preset.nameKo}</span>
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700">
                     {preset.badge}
                   </span>
                 </div>
-                <p className="text-[11px] text-zinc-500 leading-snug">{preset.description}</p>
               </button>
             );
           })}
