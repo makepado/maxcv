@@ -522,36 +522,41 @@ export const CustomizePanel: React.FC = () => {
           })}
         </div>
 
-        <div className="flex flex-wrap items-center gap-6 pt-2 border-t border-zinc-100 text-xs font-semibold text-zinc-600">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <span>포인트 색상</span>
-            <input
-              type="color"
-              value={design.accentColor}
-              onChange={(e) => updateDesign({ accentColor: e.target.value })}
-              className="w-8 h-8 rounded cursor-pointer border border-zinc-200"
-            />
-          </label>
+        <div className="pt-3 border-t border-zinc-100 space-y-2">
+          <div className="text-xs font-semibold text-zinc-600">
+            색상 직접 커스텀
+          </div>
+          <div className="flex flex-wrap items-center gap-6 text-xs font-semibold text-zinc-600">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <span>포인트 색상</span>
+              <input
+                type="color"
+                value={design.accentColor}
+                onChange={(e) => updateDesign({ accentColor: e.target.value })}
+                className="w-8 h-8 rounded cursor-pointer border border-zinc-200"
+              />
+            </label>
 
-          <label className="flex items-center gap-2 cursor-pointer">
-            <span>본문 색상</span>
-            <input
-              type="color"
-              value={design.textColor}
-              onChange={(e) => updateDesign({ textColor: e.target.value })}
-              className="w-8 h-8 rounded cursor-pointer border border-zinc-200"
-            />
-          </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <span>본문 색상</span>
+              <input
+                type="color"
+                value={design.textColor}
+                onChange={(e) => updateDesign({ textColor: e.target.value })}
+                className="w-8 h-8 rounded cursor-pointer border border-zinc-200"
+              />
+            </label>
 
-          <label className="flex items-center gap-2 cursor-pointer">
-            <span>보조 텍스트</span>
-            <input
-              type="color"
-              value={design.mutedTextColor}
-              onChange={(e) => updateDesign({ mutedTextColor: e.target.value })}
-              className="w-8 h-8 rounded cursor-pointer border border-zinc-200"
-            />
-          </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <span>보조 텍스트</span>
+              <input
+                type="color"
+                value={design.mutedTextColor}
+                onChange={(e) => updateDesign({ mutedTextColor: e.target.value })}
+                className="w-8 h-8 rounded cursor-pointer border border-zinc-200"
+              />
+            </label>
+          </div>
         </div>
       </div>
     </div>
