@@ -1,5 +1,12 @@
 export type FontCategory = 'sans' | 'serif' | 'display' | 'mono';
 
+export interface GoogleUserProfile {
+  email: string;
+  name: string;
+  picture?: string;
+  sub?: string;
+}
+
 export interface KoreanFontOption {
   id: string;
   nameKo: string;

@@ -4,6 +4,7 @@ import {
   CVDocument,
   CVSection,
   DesignSettings,
+  GoogleUserProfile,
   PersonalDetails,
   SectionItem,
   SectionType,
@@ -11,10 +12,17 @@ import {
 import { DEFAULT_DESIGN_SETTINGS, SAMPLE_CVS, SECTION_CATALOG } from '../constants/defaultCv';
 
 interface CVStoreState {
+  currentUser: GoogleUserProfile | null;
+  googleClientId: string;
   documents: CVDocument[];
   activeDocId: string;
   activeTab: 'content' | 'customize' | 'fonts' | 'templates' | 'export';
   previewZoom: number;
+
+  // Auth & User Actions
+  setCurrentUser: (user: GoogleUserProfile | null) => void;
+  setGoogleClientId: (clientId: string) => void;
+  setDocuments: (docs: CVDocument[]) => void;
 
   // Actions
   setActiveTab: (tab: 'content' | 'customize' | 'fonts' | 'templates' | 'export') => void;
@@ -56,10 +64,20 @@ function generateId(prefix: string): string {
 export const useCVStore = create<CVStoreState>()(
   persist(
     (set, get) => ({
+      currentUser: null,
+      googleClientId: '',
       documents: SAMPLE_CVS,
       activeDocId: SAMPLE_CVS[0].id,
       activeTab: 'content',
       previewZoom: 0.92,
+
+      setCurrentUser: (user) => set({ currentUser: user }),
+      setGoogleClientId: (clientId) => set({ googleClientId: clientId }),
+      setDocuments: (docs) =>
+        set({
+          documents: docs.length > 0 ? docs : SAMPLE_CVS,
+          activeDocId: docs.length > 0 ? docs[0].id : SAMPLE_CVS[0].id,
+        }),
 
       setActiveTab: (tab) => set({ activeTab: tab }),
       setPreviewZoom: (zoom) => set({ previewZoom: Math.max(0.45, Math.min(1.5, zoom)) }),
