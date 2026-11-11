@@ -229,3 +229,18 @@
     page-break-after: avoid;
   }
 }
+
+@keyframes pulse-dot-3s {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.25;
+    transform: scale(0.85);
+  }
+}
+
+.animate-pulse-3s {
+  animation: pulse-dot-3s 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

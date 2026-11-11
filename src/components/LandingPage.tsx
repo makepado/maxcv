@@ -131,7 +131,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <main className="flex-1">
         <section className="max-w-4xl mx-auto px-6 pt-20 pb-16 sm:pt-28 sm:pb-24 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-zinc-200/80 shadow-2xs text-xs font-medium text-zinc-600 mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span className="relative flex h-2 w-2">
+              <span className="animate-pulse-3s absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </span>
             <span>이력서를 편하고 깔끔하게</span>
           </div>
 
