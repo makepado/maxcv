@@ -121,42 +121,32 @@ ${sheetEl.outerHTML}
 
   return (
     <div className="space-y-5 pb-16">
-      {/* 1. PDF 즉시 다운로드 칸 */}
+      {/* 1. PDF 인쇄 및 공유 */}
       <div className="bg-zinc-950 text-white rounded-2xl p-5 shadow-md space-y-4">
         <div>
           <span className="text-[11px] font-bold uppercase tracking-wider bg-white/15 px-2.5 py-0.5 rounded-full">
             PDF Export
           </span>
-          <h3 className="text-lg font-bold mt-2">PDF 즉시 다운로드</h3>
+          <h3 className="text-lg font-bold mt-2">PDF 인쇄 및 공유</h3>
           <p className="text-xs text-zinc-300 mt-1 leading-relaxed">
-            원클릭으로 곧바로 <code>.pdf</code> 파일을 저장하거나, 텍스트 드래그와 링크 클릭이 살아있는 벡터 PDF 인쇄창을 열 수 있습니다.
+            텍스트 드래그와 링크 클릭이 살아있는 벡터 PDF 인쇄창을 열거나, 실시간 웹 공유 링크를 생성할 수 있습니다.
           </p>
         </div>
 
         <div className="flex flex-wrap gap-2.5 pt-1">
           <button
             type="button"
-            disabled={pdfGenerating}
-            onClick={handleDirectDownloadPdf}
-            className="flex-1 min-w-[170px] py-3 px-4 rounded-xl bg-white text-zinc-950 hover:bg-zinc-100 disabled:opacity-60 font-bold text-sm shadow flex items-center justify-center gap-2 transition-all"
-          >
-            <Download className="w-4 h-4" />
-            <span>{pdfGenerating ? 'PDF 생성 중...' : 'PDF 즉시 다운로드'}</span>
-          </button>
-
-          <button
-            type="button"
             onClick={handleVectorPrintPdf}
-            className="py-3 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/15 flex items-center gap-1.5 transition-all"
+            className="flex-1 min-w-[170px] py-3 px-4 rounded-xl bg-white text-zinc-950 hover:bg-zinc-100 font-bold text-sm shadow flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
             <Printer className="w-4 h-4" />
-            <span>벡터 인쇄</span>
+            <span>벡터 인쇄 (PDF 저장)</span>
           </button>
 
           <button
             type="button"
             onClick={handleCopyShareLink}
-            className="py-3 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/15 flex items-center gap-1.5 transition-all"
+            className="py-3 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/15 flex items-center gap-1.5 transition-all cursor-pointer"
           >
             <Share2 className="w-4 h-4" />
             <span>{shareCopied ? '링크 복사됨' : '공유 링크'}</span>

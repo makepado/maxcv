@@ -143,12 +143,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           <h1
-            className="text-4xl sm:text-6xl font-extrabold tracking-tight text-zinc-950 leading-[1.12]"
+            className="text-4xl sm:text-6xl font-extrabold tracking-tight text-zinc-950 leading-[1.15]"
             style={{ wordBreak: 'keep-all' }}
           >
-            정교한 한글 타이포그래피,
+            노력 없이 완성하는
             <br />
-            군더더기 없는 프로페셔널 이력서.
+            완벽한 이력서 스튜디오
           </h1>
 
           <p
