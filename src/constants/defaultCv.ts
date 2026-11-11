@@ -271,14 +271,14 @@ export const SAMPLE_CVS: CVDocument[] = [
       {
         id: 'sec-profile',
         type: 'profile',
-        title: '핵심 요약',
+        title: '',
         visible: true,
         column: 'main',
         items: [
           {
             id: 'item-prof-1',
             visible: true,
-            title: '사용자 경험과 비즈니스 지표를 동시에 견인하는 7년차 프론트엔드 엔지니어',
+            title: '',
             subtitle: '',
             startDate: '',
             endDate: '',

@@ -555,9 +555,9 @@ export const useCVStore = create<CVStoreState>()(
     }),
     {
       name: 'maxcv-storage-v1',
-      version: 5,
+      version: 6,
       migrate: (persistedState: any, version: number) => {
-        if (version < 5 && persistedState && Array.isArray(persistedState.documents)) {
+        if (version < 6 && persistedState && Array.isArray(persistedState.documents)) {
           persistedState.documents = persistedState.documents.map((doc: any) => {
             if (doc.id === 'sample-tech-lead') {
               return {

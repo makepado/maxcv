@@ -180,6 +180,10 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
       : visibleSections.filter((s) => s.column === 'sidebar');
 
   const renderSectionHeading = (section: CVSection, inSidebar = false) => {
+    if (!section.title || !section.title.trim()) {
+      return null;
+    }
+
     const accent = inSidebar ? design.accentColor : design.accentColor;
     const textCol = inSidebar ? design.sidebarTextColor : design.textColor;
 

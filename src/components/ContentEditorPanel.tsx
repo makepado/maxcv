@@ -169,7 +169,7 @@ export const ContentEditorPanel: React.FC = () => {
             ) : (
               <ChevronDown className="w-4 h-4 text-zinc-400 shrink-0" />
             )}
-            <span className="truncate">{section.title}</span>
+            <span className="truncate">{section.title || `(제목 없음 · ${meta.labelKo})`}</span>
             <span className="text-xs font-normal text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full">
               {section.items.length}
             </span>
