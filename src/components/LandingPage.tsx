@@ -89,30 +89,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     <div className="min-h-screen bg-[#fafafa] text-zinc-950 flex flex-col selection:bg-zinc-900 selection:text-white">
       {/* 미니멀 상단 네비게이션 */}
       <header className="sticky top-0 z-30 bg-[#fafafa]/85 backdrop-blur-md border-b border-zinc-200/80">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-zinc-950 text-white font-black text-sm flex items-center justify-center tracking-tighter">
               M
             </div>
             <span className="font-extrabold text-lg tracking-tight text-zinc-950">MaxCV</span>
-            <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-200/70 text-zinc-700 ml-1">
-              2.0 Studio
-            </span>
           </div>
 
-          <div className="flex items-center gap-6">
-            <a
-              href="#typography"
-              className="text-xs font-medium text-zinc-500 hover:text-zinc-950 transition-colors hidden sm:inline"
-            >
-              타이포그래피
-            </a>
-            <a
-              href="#architecture"
-              className="text-xs font-medium text-zinc-500 hover:text-zinc-950 transition-colors hidden sm:inline"
-            >
-              핵심 기능
-            </a>
+          <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={handleGoogleLoginClick}
@@ -136,7 +121,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.99 3.14c.95-2.85 3.6-4.96 6.72-4.96z"
                 />
               </svg>
-              <span>Google로 시작하기</span>
+              <span>시작하기</span>
             </button>
           </div>
         </div>
@@ -144,36 +129,35 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
       {/* 히어로 섹션 */}
       <main className="flex-1">
-        <section className="max-w-5xl mx-auto px-6 pt-20 pb-16 sm:pt-28 sm:pb-24 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-zinc-200 shadow-2xs text-xs font-medium text-zinc-600 mb-8">
-            <Sparkles className="w-3.5 h-3.5 text-zinc-900" />
-            <span>한국어 웹폰트 20종 · 정밀 A4 조판 · Google 계정별 클라우드 동기화</span>
+        <section className="max-w-4xl mx-auto px-6 pt-20 pb-16 sm:pt-28 sm:pb-24 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-zinc-200/80 shadow-2xs text-xs font-medium text-zinc-600 mb-8">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span>이력서를 편하고 깔끔하게</span>
           </div>
 
           <h1
             className="text-4xl sm:text-6xl font-extrabold tracking-tight text-zinc-950 leading-[1.12]"
             style={{ wordBreak: 'keep-all' }}
           >
-            가장 정교한 한국어 타이포그래피로
+            정교한 한글 타이포그래피,
             <br />
-            완성하는 프로페셔널 이력서.
+            군더더기 없는 프로페셔널 이력서.
           </h1>
 
           <p
-            className="mt-6 text-base sm:text-lg text-zinc-500 max-w-2xl mx-auto leading-relaxed font-normal"
+            className="mt-6 text-base sm:text-lg text-zinc-500 max-w-xl mx-auto leading-relaxed font-normal"
             style={{ wordBreak: 'keep-all' }}
           >
-            프리텐다드부터 마루부리, 리디바탕, 코펍월드바탕까지.
-            자간·행간·여백을 0.01 단위로 제어하고, Google 계정 단위로 안전하게 보관하며
-            고화질 A4 PDF로 즉시 내보내세요.
+            20종의 무료 한국어 폰트와 px 단위 정밀 조판으로
+            어떤 디바이스에서도 완벽한 A4 PDF를 완성하세요.
           </p>
 
           {/* 메인 CTA 버튼 영역 */}
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+          <div className="mt-9 flex items-center justify-center">
             <button
               type="button"
               onClick={handleGoogleLoginClick}
-              className="w-full sm:w-auto px-7 py-4 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-sm shadow-xl shadow-zinc-950/10 flex items-center justify-center gap-3 transition-all cursor-pointer group"
+              className="px-7 py-3.5 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-sm shadow-lg shadow-zinc-950/10 flex items-center justify-center gap-3 transition-all cursor-pointer group"
             >
               <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0">
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
@@ -195,24 +179,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   />
                 </svg>
               </div>
-              <span>Google 계정으로 계속하기</span>
+              <span>Google 계정으로 시작하기</span>
               <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
             </button>
-          </div>
-
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-zinc-400">
-            <span className="inline-flex items-center gap-1.5">
-              <Check className="w-3.5 h-3.5 text-zinc-700" />
-              별도 설치 없는 웹 스튜디오
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Check className="w-3.5 h-3.5 text-zinc-700" />
-              구글 계정별 D1 데이터베이스 격리 보관
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Check className="w-3.5 h-3.5 text-zinc-700" />
-              즉시 A4 PDF 파일 다운로드
-            </span>
           </div>
         </section>
 
@@ -407,16 +376,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
       {/* 하단 미니멀 푸터 */}
       <footer className="border-t border-zinc-200/80 bg-white py-8 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-400">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-zinc-900">MaxCV</span>
-            <span>·</span>
-            <span>Korean Typography Resume Studio</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-zinc-500" />
-            <span>Powered by Cloudflare Pages & D1 SQLite</span>
-          </div>
+        <div className="max-w-5xl mx-auto flex items-center justify-center gap-2 text-xs text-zinc-400">
+          <span className="font-bold text-zinc-900">MaxCV</span>
+          <span>·</span>
+          <span>이력서를 편하고 깔끔히</span>
         </div>
       </footer>
     </div>
