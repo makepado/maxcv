@@ -264,12 +264,6 @@ export const SAMPLE_CVS: CVDocument[] = [
           label: 'linkedin.com/in/minjunkim',
           url: 'https://linkedin.com/in/minjunkim',
         },
-        {
-          id: 'link-3',
-          platform: 'website',
-          label: 'minjun.dev',
-          url: 'https://minjun.dev',
-        },
       ],
       customFields: [],
     },
