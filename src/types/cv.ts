@@ -126,6 +126,10 @@ export interface DesignSettings {
 
   // 헤더 및 섹션 스타일
   headerLayout: HeaderLayout;
+  headerTitleLayout: 'stack' | 'inline'; // 'stack': 이름 아래 직무, 'inline': 이름 옆에 직무
+  nameAlign?: 'left' | 'center' | 'right';
+  jobTitleAlign?: 'left' | 'center' | 'right';
+  contactAlign?: 'left' | 'center' | 'right';
   headerBgStyle: 'none' | 'tinted' | 'solid-accent' | 'bottom-border';
   showHeaderIcons: boolean;
   headerSeparator: 'none' | 'pipe' | 'dot' | 'slash' | 'bullet';

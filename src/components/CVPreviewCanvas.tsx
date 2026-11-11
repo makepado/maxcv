@@ -529,12 +529,15 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
     const headerSubCol = isSolid ? 'rgba(255,255,255,0.88)' : design.mutedTextColor;
     const iconColor = isSolid ? '#ffffff' : design.accentColor;
 
-    const alignClass =
-      design.headerLayout === 'center'
-        ? 'text-center items-center'
-        : design.headerLayout === 'right'
-        ? 'text-right items-end'
-        : 'text-left items-start';
+    const isInlineTitle = design.headerTitleLayout === 'inline';
+    const effectiveNameAlign = design.nameAlign || design.headerLayout || 'left';
+    const effectiveJobTitleAlign = isInlineTitle
+      ? effectiveNameAlign
+      : design.jobTitleAlign || design.headerLayout || 'left';
+    const effectiveContactAlign = design.contactAlign || design.headerLayout || 'left';
+
+    const getNameAlignClass = (al: string) =>
+      al === 'center' ? 'text-center items-center justify-center' : al === 'right' ? 'text-right items-end justify-end' : 'text-left items-start justify-start';
 
     const metaList = [
       personal.email && { icon: <Mail className="w-3.5 h-3.5 shrink-0" />, text: personal.email, href: `mailto:${personal.email}` },
@@ -563,38 +566,79 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
       >
         <div
           className={`flex gap-5 ${
-            design.headerLayout === 'center'
+            effectiveNameAlign === 'center' && effectiveContactAlign === 'center'
               ? 'flex-col items-center'
-              : design.headerLayout === 'right'
-              ? 'flex-row-reverse justify-between items-center'
               : 'flex-row justify-between items-center'
           }`}
         >
           {/* 이름 & 직무 타이틀 & 연락처 */}
-          <div className={`flex-1 flex flex-col ${alignClass}`}>
-            <h1
-              className="tracking-tight leading-tight"
-              style={{
-                fontFamily: headingFont.cssFamily,
-                fontWeight: design.headingWeight,
-                fontSize: `${baseFontSizePt * 2.15}pt`,
-                letterSpacing: `${design.letterSpacing}em`,
-              }}
-            >
-              {personal.fullName || '이름을 입력하세요'}
-            </h1>
-
-            {personal.jobTitle && (
-              <p
-                className="mt-1 font-medium"
-                style={{
-                  fontFamily: headingFont.cssFamily,
-                  color: isSolid ? '#ffffff' : design.accentColor,
-                  fontSize: `${baseFontSizePt * 1.18}pt`,
-                }}
+          <div className="flex-1 flex flex-col w-full">
+            {/* 1. 이름 & 직무 영역 (나란히 배치 vs 위아래 2줄 배치) */}
+            {isInlineTitle ? (
+              <div
+                className={`flex flex-wrap items-baseline gap-x-3 gap-y-1 w-full ${
+                  effectiveNameAlign === 'center'
+                    ? 'justify-center'
+                    : effectiveNameAlign === 'right'
+                    ? 'justify-end'
+                    : 'justify-start'
+                }`}
               >
-                {personal.jobTitle}
-              </p>
+                <h1
+                  className="tracking-tight leading-tight"
+                  style={{
+                    fontFamily: headingFont.cssFamily,
+                    fontWeight: design.headingWeight,
+                    fontSize: `${baseFontSizePt * 2.15}pt`,
+                    letterSpacing: `${design.letterSpacing}em`,
+                  }}
+                >
+                  {personal.fullName || '이름을 입력하세요'}
+                </h1>
+                {personal.jobTitle && (
+                  <p
+                    className="font-medium"
+                    style={{
+                      fontFamily: headingFont.cssFamily,
+                      color: isSolid ? '#ffffff' : design.accentColor,
+                      fontSize: `${baseFontSizePt * 1.18}pt`,
+                    }}
+                  >
+                    {personal.jobTitle}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="w-full flex flex-col">
+                <div className={`w-full flex ${getNameAlignClass(effectiveNameAlign)}`}>
+                  <h1
+                    className="tracking-tight leading-tight"
+                    style={{
+                      fontFamily: headingFont.cssFamily,
+                      fontWeight: design.headingWeight,
+                      fontSize: `${baseFontSizePt * 2.15}pt`,
+                      letterSpacing: `${design.letterSpacing}em`,
+                    }}
+                  >
+                    {personal.fullName || '이름을 입력하세요'}
+                  </h1>
+                </div>
+
+                {personal.jobTitle && (
+                  <div className={`w-full flex mt-1 ${getNameAlignClass(effectiveJobTitleAlign)}`}>
+                    <p
+                      className="font-medium"
+                      style={{
+                        fontFamily: headingFont.cssFamily,
+                        color: isSolid ? '#ffffff' : design.accentColor,
+                        fontSize: `${baseFontSizePt * 1.18}pt`,
+                      }}
+                    >
+                      {personal.jobTitle}
+                    </p>
+                  </div>
+                )}
+              </div>
             )}
 
             {/* 연락처 및 소셜 링크 */}
@@ -678,9 +722,9 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
                   className={`flex flex-wrap items-center ${
                     sepChar ? 'gap-x-2.5 gap-y-1.5' : 'gap-x-4 gap-y-1.5'
                   } mt-3 ${
-                    design.headerLayout === 'center'
+                    effectiveContactAlign === 'center'
                       ? 'justify-center'
-                      : design.headerLayout === 'right'
+                      : effectiveContactAlign === 'right'
                       ? 'justify-end'
                       : 'justify-start'
                   }`}

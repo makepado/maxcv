@@ -21,6 +21,10 @@ export const DEFAULT_DESIGN_SETTINGS: DesignSettings = {
   paperSize: 'A4',
 
   headerLayout: 'left',
+  headerTitleLayout: 'stack',
+  nameAlign: 'left',
+  jobTitleAlign: 'left',
+  contactAlign: 'left',
   headerBgStyle: 'none',
   showHeaderIcons: true,
   headerSeparator: 'none',

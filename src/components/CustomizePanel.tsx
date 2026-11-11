@@ -239,33 +239,176 @@ export const CustomizePanel: React.FC = () => {
           헤더 · 섹션 · 스킬 스타일
         </h3>
 
-        {/* 상단 헤더 정렬 */}
+        {/* 이름 & 직무 배치 형태 (위아래 2줄 vs 나란히 1줄) */}
         <div>
           <label className="block text-xs font-semibold text-zinc-600 mb-1.5">
-            헤더 정렬
+            이름 · 직무 배치
           </label>
-          <div className="grid grid-cols-3 gap-2">
-            {(
-              [
-                { id: 'left', label: '좌측', icon: <AlignLeft className="w-3.5 h-3.5" /> },
-                { id: 'center', label: '중앙', icon: <AlignCenter className="w-3.5 h-3.5" /> },
-                { id: 'right', label: '우측', icon: <AlignRight className="w-3.5 h-3.5" /> },
-              ] as { id: HeaderLayout; label: string; icon: React.ReactNode }[]
-            ).map((h) => (
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { id: 'stack', label: '위아래 (2줄)' },
+              { id: 'inline', label: '나란히 (1줄 옆에)' },
+            ].map((layout) => (
               <button
-                key={h.id}
+                key={layout.id}
                 type="button"
-                onClick={() => updateDesign({ headerLayout: h.id })}
-                className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 ${
-                  design.headerLayout === h.id
+                onClick={() => {
+                  if (layout.id === 'inline') {
+                    const fallback = (design.nameAlign || (design.headerLayout === 'center' || design.headerLayout === 'right' ? design.headerLayout : 'left')) as 'left' | 'center' | 'right';
+                    updateDesign({
+                      headerTitleLayout: 'inline',
+                      nameAlign: fallback,
+                      jobTitleAlign: fallback,
+                    });
+                  } else {
+                    updateDesign({ headerTitleLayout: 'stack' });
+                  }
+                }}
+                className={`py-2 px-3 rounded-xl border text-xs font-semibold transition-all ${
+                  (design.headerTitleLayout || 'stack') === layout.id
                     ? 'border-zinc-900 bg-zinc-900 text-white'
                     : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50'
                 }`}
               >
-                {h.icon}
-                {h.label}
+                {layout.label}
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* 개별 헤더 정렬 컨트롤 */}
+        <div className="space-y-2.5 pt-1">
+          {design.headerTitleLayout === 'inline' ? (
+            /* 이름과 직무가 나란히 있을 때: 하나의 통합 정렬 */
+            <div>
+              <label className="block text-xs font-semibold text-zinc-600 mb-1">
+                이름 · 직무 정렬
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { id: 'left', label: '좌측', icon: <AlignLeft className="w-3.5 h-3.5" /> },
+                  { id: 'center', label: '중앙', icon: <AlignCenter className="w-3.5 h-3.5" /> },
+                  { id: 'right', label: '우측', icon: <AlignRight className="w-3.5 h-3.5" /> },
+                ].map((al) => {
+                  const currentAlign = design.nameAlign || design.headerLayout || 'left';
+                  const isSelected = currentAlign === al.id;
+                  return (
+                    <button
+                      key={al.id}
+                      type="button"
+                      onClick={() =>
+                        updateDesign({
+                          headerLayout: al.id as HeaderLayout,
+                          nameAlign: al.id as any,
+                          jobTitleAlign: al.id as any,
+                        })
+                      }
+                      className={`py-1.5 px-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 ${
+                        isSelected
+                          ? 'border-zinc-900 bg-zinc-900 text-white'
+                          : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50'
+                      }`}
+                    >
+                      {al.icon}
+                      {al.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            /* 위아래 2줄일 때: 이름 정렬 & 직무 정렬 각각 선택 */
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-zinc-600 mb-1">
+                  이름 정렬
+                </label>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {[
+                    { id: 'left', label: '좌측' },
+                    { id: 'center', label: '중앙' },
+                    { id: 'right', label: '우측' },
+                  ].map((al) => {
+                    const isSelected = (design.nameAlign || design.headerLayout || 'left') === al.id;
+                    return (
+                      <button
+                        key={al.id}
+                        type="button"
+                        onClick={() => updateDesign({ nameAlign: al.id as any })}
+                        className={`py-1.5 px-1.5 rounded-xl border text-xs font-semibold ${
+                          isSelected
+                            ? 'border-zinc-900 bg-zinc-900 text-white'
+                            : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50'
+                        }`}
+                      >
+                        {al.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-zinc-600 mb-1">
+                  직무 정렬
+                </label>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {[
+                    { id: 'left', label: '좌측' },
+                    { id: 'center', label: '중앙' },
+                    { id: 'right', label: '우측' },
+                  ].map((al) => {
+                    const isSelected =
+                      (design.jobTitleAlign || design.headerLayout || 'left') === al.id;
+                    return (
+                      <button
+                        key={al.id}
+                        type="button"
+                        onClick={() => updateDesign({ jobTitleAlign: al.id as any })}
+                        className={`py-1.5 px-1.5 rounded-xl border text-xs font-semibold ${
+                          isSelected
+                            ? 'border-zinc-900 bg-zinc-900 text-white'
+                            : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50'
+                        }`}
+                      >
+                        {al.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 프로필 헤더 (연락처/링크) 정렬 */}
+          <div>
+            <label className="block text-xs font-semibold text-zinc-600 mb-1">
+              연락처 · 링크 정렬
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { id: 'left', label: '좌측', icon: <AlignLeft className="w-3.5 h-3.5" /> },
+                { id: 'center', label: '중앙', icon: <AlignCenter className="w-3.5 h-3.5" /> },
+                { id: 'right', label: '우측', icon: <AlignRight className="w-3.5 h-3.5" /> },
+              ].map((al) => {
+                const isSelected = (design.contactAlign || design.headerLayout || 'left') === al.id;
+                return (
+                  <button
+                    key={al.id}
+                    type="button"
+                    onClick={() => updateDesign({ contactAlign: al.id as any })}
+                    className={`py-1.5 px-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 ${
+                      isSelected
+                        ? 'border-zinc-900 bg-zinc-900 text-white'
+                        : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50'
+                    }`}
+                  >
+                    {al.icon}
+                    {al.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
