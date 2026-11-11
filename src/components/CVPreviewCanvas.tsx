@@ -591,7 +591,9 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
             >
               {metaList.map((m, idx) => (
                 <div key={idx} className="inline-flex items-center gap-1.5">
-                  <span style={{ color: iconColor }}>{m.icon}</span>
+                  {design.showHeaderIcons !== false && (
+                    <span style={{ color: iconColor }}>{m.icon}</span>
+                  )}
                   {m.href ? (
                     <a href={m.href} className="hover:underline">
                       {m.text}
@@ -622,7 +624,9 @@ export const CVPreviewCanvas: React.FC<CVPreviewCanvasProps> = ({ doc }) => {
                     rel="noreferrer"
                     className="inline-flex items-center gap-1 hover:underline font-medium"
                   >
-                    <span style={{ color: iconColor }}>{getSocialIcon(link.platform)}</span>
+                    {design.showHeaderIcons !== false && (
+                      <span style={{ color: iconColor }}>{getSocialIcon(link.platform)}</span>
+                    )}
                     <span>{design.linkShowFullUrl && link.url ? link.url : link.label || link.url}</span>
                   </a>
                 ) : null

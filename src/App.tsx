@@ -200,10 +200,10 @@ export function App() {
         {/* 중앙 메인 탭 전환 */}
         <nav className="hidden xl:flex items-center bg-zinc-100 p-1 rounded-xl border border-zinc-200/80">
           {[
-            { id: 'content', label: '1. 콘텐츠 편집', icon: <FileText className="w-3.5 h-3.5" /> },
-            { id: 'fonts', label: '2. 한국어 폰트 (20종)', icon: <Type className="w-3.5 h-3.5" /> },
-            { id: 'customize', label: '3. 레이아웃·디자인', icon: <Sliders className="w-3.5 h-3.5" /> },
-            { id: 'export', label: '4. PDF·클라우드', icon: <Download className="w-3.5 h-3.5" /> },
+            { id: 'content', label: '콘텐츠', icon: <FileText className="w-3.5 h-3.5" /> },
+            { id: 'fonts', label: '한국어 폰트', icon: <Type className="w-3.5 h-3.5" /> },
+            { id: 'customize', label: '디자인', icon: <Sliders className="w-3.5 h-3.5" /> },
+            { id: 'export', label: '저장', icon: <Download className="w-3.5 h-3.5" /> },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -296,7 +296,7 @@ export function App() {
             { id: 'content', label: '콘텐츠', icon: <FileText className="w-3.5 h-3.5" /> },
             { id: 'fonts', label: '한국어 폰트', icon: <Type className="w-3.5 h-3.5" /> },
             { id: 'customize', label: '디자인', icon: <Sliders className="w-3.5 h-3.5" /> },
-            { id: 'export', label: 'PDF·D1', icon: <Download className="w-3.5 h-3.5" /> },
+            { id: 'export', label: '저장', icon: <Download className="w-3.5 h-3.5" /> },
           ].map((tab) => (
             <button
               key={tab.id}

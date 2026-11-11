@@ -119,14 +119,14 @@ export const useCVStore = create<CVStoreState>()(
                 {
                   id: generateId('sec'),
                   type: 'profile',
-                  title: '자기소개 (Profile)',
+                  title: '핵심 요약',
                   visible: true,
                   column: 'main',
                   items: [
                     {
                       id: generateId('item'),
                       visible: true,
-                      title: '핵심 역량 한 줄 요약',
+                      title: '헤드라인',
                       subtitle: '',
                       startDate: '',
                       endDate: '',
@@ -134,7 +134,7 @@ export const useCVStore = create<CVStoreState>()(
                       location: '',
                       url: '',
                       urlLabel: '',
-                      description: '이곳에 본인의 핵심 강점과 경력 요약을 작성하세요.',
+                      description: '• 핵심 강점과 경력 요약을 작성하세요.',
                       tags: [],
                       level: 5,
                       levelText: '',
@@ -144,7 +144,7 @@ export const useCVStore = create<CVStoreState>()(
                 {
                   id: generateId('sec'),
                   type: 'experience',
-                  title: '경력사항 (Experience)',
+                  title: '경력사항',
                   visible: true,
                   column: 'main',
                   items: [
@@ -152,14 +152,14 @@ export const useCVStore = create<CVStoreState>()(
                       id: generateId('item'),
                       visible: true,
                       title: '회사명',
-                      subtitle: '담당 직무 / 직책',
+                      subtitle: '직책',
                       startDate: '2024.01',
                       endDate: '',
                       isCurrent: true,
                       location: '서울',
                       url: '',
                       urlLabel: '',
-                      description: '• 주요 담당 업무 및 정량적 성과를 작성하세요.',
+                      description: '• 주요 담당 업무 및 성과를 작성하세요.',
                       tags: ['핵심역량1', '핵심역량2'],
                       level: 5,
                       levelText: '',
@@ -169,7 +169,7 @@ export const useCVStore = create<CVStoreState>()(
                 {
                   id: generateId('sec'),
                   type: 'education',
-                  title: '학력사항 (Education)',
+                  title: '학력사항',
                   visible: true,
                   column: 'sidebar',
                   items: [
@@ -194,14 +194,14 @@ export const useCVStore = create<CVStoreState>()(
                 {
                   id: generateId('sec'),
                   type: 'skills',
-                  title: '보유 기술 (Skills)',
+                  title: '보유 기술',
                   visible: true,
                   column: 'sidebar',
                   items: [
                     {
                       id: generateId('item'),
                       visible: true,
-                      title: '직무 전문 스킬',
+                      title: '직무 스킬',
                       subtitle: '',
                       startDate: '',
                       endDate: '',

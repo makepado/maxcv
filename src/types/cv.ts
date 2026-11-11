@@ -127,6 +127,7 @@ export interface DesignSettings {
   // 헤더 및 섹션 스타일
   headerLayout: HeaderLayout;
   headerBgStyle: 'none' | 'tinted' | 'solid-accent' | 'bottom-border';
+  showHeaderIcons: boolean;
   headingStyle: HeadingStyle;
   showSectionIcons: boolean;
   skillDisplayStyle: SkillDisplayStyle;
