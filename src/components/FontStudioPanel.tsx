@@ -48,31 +48,31 @@ export const FontStudioPanel: React.FC = () => {
       name: '마루부리 + 리디바탕',
       heading: 'maruburi',
       body: 'ridi-batang',
-      desc: '기품 있는 마루부리 헤딩과 가독성이 뛰어난 리디바탕 본문',
+      desc: '단아한 마루부리 제목과 정돈된 리디바탕 본문',
     },
     {
       name: '원티드 산스 + 수트',
       heading: 'wanted-sans',
       body: 'suit',
-      desc: '선명한 타이틀과 밀도 높은 본문의 IT·스타트업 조합',
+      desc: '선명한 산세리프 제목과 밀도 높은 고딕 본문',
     },
     {
       name: '본명조 + 코펍월드바탕',
       heading: 'noto-serif-kr',
       body: 'kopub-batang',
-      desc: '논문, 출판, 학위 이력서에 어울리는 정통 명조 조합',
+      desc: '안정적인 본명조 제목과 가독성이 높은 바탕 본문',
     },
     {
       name: '페이퍼로지 + 프리텐다드',
       heading: 'paperlogy',
       body: 'pretendard',
-      desc: '시선을 끄는 타이틀과 안정적인 본문 가독성',
+      desc: '시선을 끄는 볼드 타이틀과 단정한 고딕 본문',
     },
     {
       name: '지마켓 산스 + 스포카 한 산스',
       heading: 'gmarket-sans',
       body: 'spoqa-han-sans',
-      desc: '강조된 섹션 타이틀과 숫자 가독성이 뛰어난 본문',
+      desc: '기하학적 제목과 균형 잡힌 본문',
     },
   ];
 
@@ -741,13 +741,8 @@ export const FontStudioPanel: React.FC = () => {
                         본문
                       </span>
                     )}
-                    <span className="text-[11px] text-zinc-400 font-medium">
-                      {font.recommendedFor}
-                    </span>
                   </div>
                 </div>
-
-                <p className="text-xs text-zinc-500 mb-2.5">{font.description}</p>
 
                 <div
                   className="p-2.5 rounded-lg bg-white border border-zinc-200/80 text-sm text-zinc-800"
