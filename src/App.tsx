@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   FileText,
   Type,
@@ -16,6 +16,10 @@ import {
   Sparkles,
   Check,
   LogOut,
+  Eye,
+  PenLine,
+  Menu,
+  X,
 } from 'lucide-react';
 import { useCVStore } from './store/useCVStore';
 import { ContentEditorPanel } from './components/ContentEditorPanel';
@@ -28,7 +32,7 @@ import { LandingPage } from './components/LandingPage';
 import { SAMPLE_CVS } from './constants/defaultCv';
 import { createBlankCareerDoc, SAMPLE_CAREERS } from './constants/careerSamples';
 import { GoogleUserProfile } from './types/cv';
-import { downloadResumePdfFile, printVectorPdfClean } from './utils/pdfExport';
+import { printVectorPdfClean } from './utils/pdfExport';
 
 export function App() {
   const currentUser = useCVStore((s) => s.currentUser);
@@ -52,9 +56,95 @@ export function App() {
 
   const [showDocDrawer, setShowDocDrawer] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [quickSaved, setQuickSaved] = useState(false);
-  const [pdfDownloading, setPdfDownloading] = useState(false);
   const [mobileView, setMobileView] = useState<'editor' | 'preview'>('editor');
+
+  // 모바일/태블릿 화면 폭 감지 및 A4 용지 자동 배율(Auto-Fit) 계산
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== 'undefined' ? window.innerWidth : 1280
+  );
+  const [previewAreaWidth, setPreviewAreaWidth] = useState<number>(0);
+  const [mobileCustomZoom, setMobileCustomZoom] = useState<number | null>(null);
+  const [sheetNaturalHeight, setSheetNaturalHeight] = useState<number>(1123);
+  const previewContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const isLetter = activeDoc.design.paperSize === 'LETTER';
+  // 96 DPI 기준: 210mm ≈ 793.7px, 215.9mm ≈ 816px
+  const sheetBaseWidthPx = isLetter ? 816 : 794;
+  const sheetMinHeightPx = isLetter ? 1056 : 1123;
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // 모바일 화면 크기 변경 시 수동 줌 초기화하여 화면 맞춤 유지
+  useEffect(() => {
+    if (windowWidth >= 1024) {
+      setMobileCustomZoom(null);
+      setShowMobileMenu(false);
+    }
+  }, [windowWidth]);
+
+  // 미리보기 컨테이너 폭 및 실제 A4 시트 높이 감지
+  useEffect(() => {
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(() => {
+      if (previewContainerRef.current) {
+        const cw = previewContainerRef.current.clientWidth;
+        if (cw > 0) setPreviewAreaWidth(cw);
+      }
+      const sheetEl = document.getElementById('maxcv-printable-sheet');
+      if (sheetEl) {
+        const h = sheetEl.scrollHeight || sheetEl.offsetHeight;
+        if (h > 100) {
+          setSheetNaturalHeight(Math.max(sheetMinHeightPx, h));
+        }
+      }
+    });
+
+    if (previewContainerRef.current) {
+      observer.observe(previewContainerRef.current);
+    }
+    const sheetEl = document.getElementById('maxcv-printable-sheet');
+    if (sheetEl) {
+      observer.observe(sheetEl);
+    }
+    return () => observer.disconnect();
+  }, [activeDoc, mobileView, sheetMinHeightPx]);
+
+  const isMobileViewport = windowWidth < 1024;
+  const baseAvailableWidth =
+    previewAreaWidth > 0 ? previewAreaWidth : windowWidth;
+  // 모바일 좌우 여백(24px)을 제외한 영역에 A4 시트가 정확히 들어오도록 배율 산출
+  const availableMobileWidth = Math.max(260, baseAvailableWidth - 24);
+  const autoFitMobileZoom = Number(
+    Math.min(0.95, Math.max(0.32, availableMobileWidth / sheetBaseWidthPx)).toFixed(3)
+  );
+  const effectiveZoom = isMobileViewport
+    ? mobileCustomZoom ?? autoFitMobileZoom
+    : previewZoom;
+
+  const handleZoomChange = (delta: number) => {
+    if (isMobileViewport) {
+      const next = Math.min(1.4, Math.max(0.3, Number((effectiveZoom + delta).toFixed(2))));
+      setMobileCustomZoom(next);
+    } else {
+      setPreviewZoom(previewZoom + delta);
+    }
+  };
+
+  const handleZoomReset = () => {
+    if (isMobileViewport) {
+      setMobileCustomZoom(null);
+    } else {
+      setPreviewZoom(0.92);
+    }
+  };
 
   // 구글 계정 로그인 시 해당 계정(user_email)의 D1 이력서 목록 자동 로드 또는 초기 동기화
   const syncUserAccountResumes = async (user: GoogleUserProfile) => {
@@ -155,38 +245,40 @@ export function App() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fafafa] text-zinc-900">
+    <div className="min-h-dvh w-full max-w-[100vw] overflow-x-hidden flex flex-col bg-[#fafafa] text-zinc-900">
       {/* 상단 글로벌 네비게이션 바 (인쇄 시 숨김) */}
-      <header className="no-print sticky top-0 z-30 h-15 bg-white/95 backdrop-blur border-b border-zinc-200/90 px-4 py-2.5 flex items-center justify-between gap-3">
-        {/* 브랜드 로고 (클릭 시 기본 콘텐츠 탭으로 이동) & 현재 문서 이름 */}
-        <div className="flex items-center gap-3 min-w-0">
+      <header className="no-print sticky top-0 z-30 h-14 bg-white/95 backdrop-blur border-b border-zinc-200/90 px-3 sm:px-4 flex items-center justify-between gap-2">
+        {/* 좌측: 로고 + 현재 문서 제목 */}
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
           <button
             type="button"
-            onClick={() => setActiveTab('content')}
+            onClick={() => {
+              setActiveTab('content');
+              setMobileView('editor');
+              setShowMobileMenu(false);
+            }}
             className="flex items-center gap-2 shrink-0 group text-left cursor-pointer"
             title="홈(콘텐츠 탭)으로 이동"
           >
             <div className="w-8 h-8 rounded-lg bg-zinc-950 group-hover:bg-zinc-800 text-white font-black text-sm flex items-center justify-center transition-colors">
               M
             </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-base tracking-tight text-zinc-950 group-hover:text-zinc-700 transition-colors">
-                  MaxCV
-                </span>
-                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200">
-                  Studio
-                </span>
-              </div>
+            <div className="hidden sm:flex items-center gap-1.5">
+              <span className="font-extrabold text-base tracking-tight text-zinc-950 group-hover:text-zinc-700 transition-colors">
+                MaxCV
+              </span>
+              <span className="hidden md:inline-block text-[10px] font-semibold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200">
+                Studio
+              </span>
             </div>
           </button>
 
-          <div className="h-4 w-[1px] bg-zinc-200 hidden sm:block" />
+          <div className="h-4 w-[1px] bg-zinc-200 hidden sm:block shrink-0" />
 
-          {/* 현재 문서 제목 인라인 수정 & 보관함 열기 */}
-          <div className="flex items-center gap-1.5 min-w-0">
+          {/* 현재 문서 제목 인라인 수정 & 데스크톱 보관함 버튼 */}
+          <div className="flex items-center gap-1.5 min-w-0 flex-1">
             <span
-              className={`hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0 ${
+              className={`hidden md:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0 ${
                 activeDoc.docType === 'career'
                   ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
                   : 'bg-zinc-100 text-zinc-700 border border-zinc-200'
@@ -198,21 +290,22 @@ export function App() {
               type="text"
               value={activeDoc.name}
               onChange={(e) => renameDocument(activeDoc.id, e.target.value)}
-              className="text-sm font-bold text-zinc-900 bg-zinc-100/80 hover:bg-zinc-100 focus:bg-white px-2.5 py-1.5 rounded-lg border border-transparent focus:border-zinc-900 outline-none truncate max-w-[160px] sm:max-w-[230px]"
+              className="text-xs sm:text-sm font-bold text-zinc-900 bg-zinc-100/80 hover:bg-zinc-100 focus:bg-white px-2.5 py-1.5 rounded-lg border border-transparent focus:border-zinc-900 outline-none truncate w-0 flex-1 max-w-[180px] sm:max-w-[220px]"
               title="클릭하여 문서 제목 변경"
             />
             <button
               type="button"
               onClick={() => setShowDocDrawer(!showDocDrawer)}
-              className="px-2.5 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-xs font-semibold text-zinc-700 flex items-center gap-1 shrink-0"
+              className="hidden lg:flex px-2.5 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-xs font-semibold text-zinc-700 items-center gap-1 shrink-0"
+              title="문서 보관함 열기"
             >
               <FolderOpen className="w-3.5 h-3.5 text-zinc-700" />
-              <span className="hidden md:inline">보관함 ({documents.length})</span>
+              <span>보관함 ({documents.length})</span>
             </button>
           </div>
         </div>
 
-        {/* 중앙 메인 탭 전환 */}
+        {/* 중앙 메인 탭 전환 (데스크톱 xl 이상) */}
         <nav className="hidden xl:flex items-center bg-zinc-100 p-1 rounded-xl border border-zinc-200/80">
           {[
             { id: 'content', label: '콘텐츠', icon: <FileText className="w-3.5 h-3.5" /> },
@@ -236,8 +329,8 @@ export function App() {
           ))}
         </nav>
 
-        {/* 우측: Google 계정 상태 + 저장 버튼 + 프린트 아이콘 + 로그아웃 */}
-        <div className="flex items-center gap-2 shrink-0">
+        {/* 우측 (데스크톱 lg 이상): 계정 + 클라우드 저장 + 인쇄 + 로그아웃 */}
+        <div className="hidden lg:flex items-center gap-2 shrink-0">
           <button
             type="button"
             onClick={() => setShowAuthModal(true)}
@@ -279,7 +372,7 @@ export function App() {
             ) : (
               <>
                 <CloudUpload className="w-3.5 h-3.5 text-zinc-700" />
-                <span className="hidden sm:inline">클라우드 저장</span>
+                <span>클라우드 저장</span>
               </>
             )}
           </button>
@@ -302,43 +395,185 @@ export function App() {
             <LogOut className="w-4 h-4" />
           </button>
         </div>
+
+        {/* 우측 (모바일/태블릿 lg 미만): 미리보기 전환 버튼 + 햄버거 메뉴 버튼 */}
+        <div className="flex lg:hidden items-center gap-1.5 shrink-0">
+          <button
+            type="button"
+            onClick={() => {
+              setMobileView(mobileView === 'editor' ? 'preview' : 'editor');
+              setShowMobileMenu(false);
+            }}
+            className="px-3 py-1.5 rounded-lg bg-zinc-950 text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs"
+          >
+            {mobileView === 'editor' ? (
+              <>
+                <Eye className="w-3.5 h-3.5" />
+                <span>미리보기</span>
+              </>
+            ) : (
+              <>
+                <PenLine className="w-3.5 h-3.5" />
+                <span>편집하기</span>
+              </>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            className="p-2 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-800 flex items-center justify-center"
+            aria-label="메뉴 열기"
+          >
+            {showMobileMenu ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          </button>
+        </div>
       </header>
 
-      {/* 모바일/태블릿용 보조 탭 바 */}
-      <div className="no-print xl:hidden bg-white border-b border-zinc-200 px-3 py-2 flex items-center justify-between gap-2 overflow-x-auto">
-        <div className="flex items-center gap-1">
+      {/* 모바일 햄버거 메뉴 드롭다운 시트 (lg 미만) */}
+      {showMobileMenu && (
+        <div
+          className="no-print lg:hidden fixed inset-0 top-14 z-40 bg-zinc-950/30 backdrop-blur-2xs"
+          onClick={() => setShowMobileMenu(false)}
+        >
+          <div
+            className="bg-white border-b border-zinc-200 shadow-xl p-4 space-y-3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 로그인 계정 요약 */}
+            <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50 border border-zinc-200/80">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                  <path
+                    fill="#4285F4"
+                    d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.14C3.26 21.3 7.31 24 12 24z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.28 14.24c-.24-.72-.38-1.49-.38-2.24s.14-1.52.38-2.24V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.99-3.14z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.99 3.14c.95-2.85 3.6-4.96 6.72-4.96z"
+                  />
+                </svg>
+                <div className="min-w-0">
+                  <div className="text-xs font-bold text-zinc-900 truncate">{currentUser.name}</div>
+                  <div className="text-[11px] text-zinc-500 truncate">{currentUser.email}</div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowMobileMenu(false);
+                  setShowAuthModal(true);
+                }}
+                className="px-2.5 py-1 rounded-lg border border-zinc-200 bg-white text-[11px] font-semibold text-zinc-700 shrink-0"
+              >
+                계정 전환
+              </button>
+            </div>
+
+            {/* 주요 메뉴 액션 그리드 */}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowMobileMenu(false);
+                  setShowDocDrawer(true);
+                }}
+                className="p-3 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 flex items-center justify-center gap-2"
+              >
+                <FolderOpen className="w-4 h-4 text-zinc-700" />
+                <span>보관함 ({documents.length})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  handleQuickSaveD1();
+                }}
+                className="p-3 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 flex items-center justify-center gap-2"
+              >
+                {quickSaved ? (
+                  <>
+                    <Check className="w-4 h-4 text-emerald-600" />
+                    <span className="text-emerald-700">저장됨</span>
+                  </>
+                ) : (
+                  <>
+                    <CloudUpload className="w-4 h-4 text-zinc-700" />
+                    <span>클라우드 저장</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowMobileMenu(false);
+                  printVectorPdfClean(activeDoc);
+                }}
+                className="p-3 rounded-xl bg-zinc-950 text-white text-xs font-bold flex items-center justify-center gap-2"
+              >
+                <Printer className="w-4 h-4" />
+                <span>PDF 인쇄 / 저장</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowMobileMenu(false);
+                  setCurrentUser(null);
+                }}
+                className="p-3 rounded-xl border border-rose-200 bg-rose-50/60 text-rose-600 text-xs font-bold flex items-center justify-center gap-2"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>로그아웃</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 모바일/태블릿용 에디터 4분할 탭 바 (미리보기 모드일 때는 숨겨서 화면을 미니멀하게 유지) */}
+      <div
+        className={`no-print xl:hidden bg-white border-b border-zinc-200 px-3 py-1.5 ${
+          mobileView === 'preview' ? 'hidden lg:block' : 'block'
+        }`}
+      >
+        <div className="grid grid-cols-4 gap-1 max-w-2xl mx-auto">
           {[
             { id: 'content', label: '콘텐츠', icon: <FileText className="w-3.5 h-3.5" /> },
-            { id: 'fonts', label: '한국어 폰트', icon: <Type className="w-3.5 h-3.5" /> },
+            { id: 'fonts', label: '폰트', icon: <Type className="w-3.5 h-3.5" /> },
             { id: 'customize', label: '디자인', icon: <Sliders className="w-3.5 h-3.5" /> },
             { id: 'export', label: '저장', icon: <Download className="w-3.5 h-3.5" /> },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => {
-                setActiveTab(tab.id as any);
-                setMobileView('editor');
-              }}
-              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shrink-0 ${
-                activeTab === tab.id && mobileView === 'editor'
-                  ? 'bg-zinc-950 text-white'
-                  : 'bg-zinc-100 text-zinc-600'
-              }`}
-            >
-              {tab.icon}
-              <span>{tab.label}</span>
-            </button>
-          ))}
+          ].map((tab) => {
+            const isTabActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => {
+                  setActiveTab(tab.id as any);
+                  setMobileView('editor');
+                }}
+                className={`py-2 px-1 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+                  isTabActive
+                    ? 'bg-zinc-950 text-white shadow-2xs'
+                    : 'bg-zinc-100/80 text-zinc-600 hover:bg-zinc-200/70'
+                }`}
+              >
+                {tab.icon}
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
         </div>
-
-        <button
-          type="button"
-          onClick={() => setMobileView(mobileView === 'editor' ? 'preview' : 'editor')}
-          className="px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs font-bold shrink-0 lg:hidden"
-        >
-          {mobileView === 'editor' ? '미리보기 보기' : '편집기로 돌아가기'}
-        </button>
       </div>
 
       {/* Google 로그인 모달 */}
@@ -350,31 +585,36 @@ export function App() {
         }}
       />
 
-      {/* 다중 이력서·경력기술서 관리 드로어 모달 */}
+      {/* 다중 이력서·경력기술서 관리 드로어 모달 (모바일 바텀시트 & 데스크톱 센터 모달 대응) */}
       {showDocDrawer && (
-        <div className="no-print fixed inset-0 z-50 bg-zinc-950/40 backdrop-blur-xs flex items-start justify-center pt-16 px-4">
-          <div className="bg-white rounded-2xl border border-zinc-200 shadow-2xl max-w-2xl w-full p-5 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
-              <div>
-                <h2 className="text-base font-bold text-zinc-900">
-                  {currentUser.name} ({currentUser.email}) 님의 문서 보관함
+        <div
+          className="no-print fixed inset-0 z-50 bg-zinc-950/45 backdrop-blur-xs flex items-end sm:items-start justify-center sm:pt-16 p-0 sm:px-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowDocDrawer(false);
+          }}
+        >
+          <div className="bg-white rounded-t-3xl sm:rounded-2xl border border-zinc-200 shadow-2xl max-w-2xl w-full p-4 sm:p-5 space-y-4 max-h-[88dvh] flex flex-col">
+            <div className="flex items-start justify-between gap-2 pb-3 border-b border-zinc-100 shrink-0">
+              <div className="min-w-0">
+                <h2 className="text-sm sm:text-base font-bold text-zinc-900 truncate">
+                  {currentUser.name} 님의 문서 보관함
                 </h2>
-                <p className="text-xs text-zinc-500">
-                  이력서와 경력기술서를 각각 만들고 관리할 수 있습니다.
+                <p className="text-xs text-zinc-500 truncate mt-0.5">
+                  {currentUser.email} · 이력서와 경력기술서를 각각 관리할 수 있습니다.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowDocDrawer(false)}
-                className="text-sm text-zinc-400 hover:text-zinc-700 font-bold px-2 py-1"
+                className="text-sm text-zinc-400 hover:text-zinc-700 font-bold px-2 py-1 shrink-0"
               >
                 ✕
               </button>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 shrink-0">
               {/* 이력서 생성 버튼 행 */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 sm:gap-2">
                 <button
                   type="button"
                   onClick={() => {
@@ -413,7 +653,7 @@ export function App() {
               </div>
 
               {/* 경력기술서 생성 버튼 행 */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 sm:gap-2">
                 <button
                   type="button"
                   onClick={() => {
@@ -452,7 +692,7 @@ export function App() {
               </div>
             </div>
 
-            <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+            <div className="space-y-2 overflow-y-auto pr-1 flex-1 min-h-0">
               {documents.map((item) => {
                 const isCurrent = item.id === activeDoc.id;
                 const isCareer = item.docType === 'career';
@@ -472,7 +712,7 @@ export function App() {
                       }}
                       className="flex-1 min-w-0 cursor-pointer"
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 sm:gap-2">
                         <span
                           className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${
                             isCareer
@@ -482,22 +722,22 @@ export function App() {
                         >
                           {isCareer ? '경력기술서' : '이력서'}
                         </span>
-                        <span className="font-bold text-sm text-zinc-900 truncate">
+                        <span className="font-bold text-xs sm:text-sm text-zinc-900 truncate">
                           {item.name}
                         </span>
                         {isCurrent && (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-900 text-white shrink-0">
-                            현재 편집중
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-900 text-white shrink-0">
+                            편집중
                           </span>
                         )}
                       </div>
-                      <div className="text-xs text-zinc-500 mt-0.5">
+                      <div className="text-xs text-zinc-500 mt-0.5 truncate">
                         {item.personal.fullName} · {item.personal.jobTitle} · 섹션{' '}
                         {item.sections.length}개
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1 ml-3">
+                    <div className="flex items-center gap-1 ml-2 shrink-0">
                       <button
                         type="button"
                         onClick={() => duplicateDocument(item.id)}
@@ -526,14 +766,14 @@ export function App() {
       )}
 
       {/* 메인 좌우 분할 워크스페이스 */}
-      <div className="print-workspace-wrapper flex-1 flex overflow-hidden">
+      <div className="print-workspace-wrapper flex-1 flex overflow-hidden w-full">
         {/* 좌측 에디터 패널 */}
         <div
-          className={`no-print w-full lg:w-[48%] xl:w-[45%] h-[calc(100vh-60px)] overflow-y-auto p-4 sm:p-6 border-r border-zinc-200 bg-[#fafafa] ${
+          className={`editor-panel-container no-print w-full lg:w-[48%] xl:w-[45%] h-[calc(100dvh-105px)] xl:h-[calc(100dvh-56px)] overflow-y-auto overflow-x-hidden p-3 sm:p-6 pb-12 border-r border-zinc-200 bg-[#fafafa] ${
             mobileView === 'preview' ? 'hidden lg:block' : 'block'
           }`}
         >
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-2xl mx-auto w-full">
             {activeTab === 'content' && <ContentEditorPanel />}
             {activeTab === 'fonts' && <FontStudioPanel />}
             {activeTab === 'customize' && <CustomizePanel />}
@@ -545,49 +785,62 @@ export function App() {
 
         {/* 우측 실시간 A4 캔버스 미리보기 영역 */}
         <div
-          className={`print-container flex-1 h-[calc(100vh-60px)] overflow-auto bg-zinc-200/70 relative flex flex-col items-center py-8 px-4 ${
+          ref={previewContainerRef}
+          className={`print-container flex-1 w-full h-[calc(100dvh-56px)] lg:h-[calc(100dvh-105px)] xl:h-[calc(100dvh-56px)] overflow-auto bg-zinc-200/70 relative flex flex-col items-center py-3 sm:py-6 px-3 sm:px-4 pb-12 ${
             mobileView === 'editor' ? 'hidden lg:flex' : 'flex'
           }`}
         >
-          {/* 상단 플로팅 줌 컨트롤러 */}
-          <div className="no-print sticky top-0 z-20 mb-4 flex items-center gap-1.5 bg-zinc-950/90 backdrop-blur text-white px-3 py-1.5 rounded-full shadow-lg text-xs">
-            <button
-              type="button"
-              onClick={() => setPreviewZoom(previewZoom - 0.08)}
-              className="p-1 hover:text-zinc-300"
-              title="축소"
-            >
-              <ZoomOut className="w-3.5 h-3.5" />
-            </button>
-            <span className="font-mono font-semibold w-12 text-center">
-              {Math.round(previewZoom * 100)}%
-            </span>
-            <button
-              type="button"
-              onClick={() => setPreviewZoom(previewZoom + 0.08)}
-              className="p-1 hover:text-zinc-300"
-              title="확대"
-            >
-              <ZoomIn className="w-3.5 h-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setPreviewZoom(0.92)}
-              className="p-1 hover:text-zinc-300 ml-1 border-l border-white/20 pl-2 flex items-center gap-1"
-              title="기본 배율 복원"
-            >
-              <RotateCcw className="w-3 h-3" />
-              <span>맞춤</span>
-            </button>
+          {/* 상단 줌 & 인쇄 바 (이력서 용지를 가리지 않도록 깔끔하게 상단 배치) */}
+          <div className="no-print mb-3 flex items-center justify-between gap-2 bg-zinc-950/90 backdrop-blur text-white px-3 py-1.5 rounded-full shadow-md text-xs shrink-0">
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => handleZoomChange(-0.08)}
+                className="p-1 hover:text-zinc-300"
+                title="축소"
+              >
+                <ZoomOut className="w-3.5 h-3.5" />
+              </button>
+              <span className="font-mono font-semibold w-11 text-center">
+                {Math.round(effectiveZoom * 100)}%
+              </span>
+              <button
+                type="button"
+                onClick={() => handleZoomChange(0.08)}
+                className="p-1 hover:text-zinc-300"
+                title="확대"
+              >
+                <ZoomIn className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={handleZoomReset}
+                className="p-1 hover:text-zinc-300 ml-1 border-l border-white/20 pl-2 flex items-center gap-1"
+                title="화면 폭에 맞춤"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>맞춤</span>
+              </button>
+            </div>
           </div>
 
+          {/* 스케일된 A4 시트의 실제 레이아웃 크기를 잡아주는 래퍼 (모바일 좌우 잘림 및 하단 빈 여백 완벽 제거) */}
           <div
-            className="print-container origin-top transition-transform duration-150"
+            className="print-container relative mx-auto shrink-0"
             style={{
-              transform: `scale(${previewZoom})`,
+              width: `${Math.round(sheetBaseWidthPx * effectiveZoom)}px`,
+              height: `${Math.round(sheetNaturalHeight * effectiveZoom)}px`,
             }}
           >
-            <CVPreviewCanvas doc={activeDoc} />
+            <div
+              className="print-container origin-top-left transition-transform duration-150"
+              style={{
+                width: `${sheetBaseWidthPx}px`,
+                transform: `scale(${effectiveZoom})`,
+              }}
+            >
+              <CVPreviewCanvas doc={activeDoc} />
+            </div>
           </div>
         </div>
       </div>
@@ -596,3 +849,5 @@ export function App() {
 }
 
 export default App;
+
+

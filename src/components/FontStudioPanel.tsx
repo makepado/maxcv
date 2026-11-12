@@ -654,7 +654,7 @@ export const FontStudioPanel: React.FC = () => {
         </div>
 
         {/* 카테고리 탭 & 검색창 */}
-        <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
           <div className="flex flex-wrap gap-1.5">
             {[
               { id: 'all', label: '전체' },
@@ -678,8 +678,8 @@ export const FontStudioPanel: React.FC = () => {
             ))}
           </div>
 
-          <div className="relative flex-1 min-w-[160px]">
-            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-2.5" />
+          <div className="relative w-full sm:w-auto sm:flex-1 sm:min-w-[160px] sm:max-w-[220px]">
+            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}

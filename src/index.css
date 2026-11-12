@@ -123,9 +123,36 @@
 }
 
 @layer base {
-  body {
+  html,
+  body,
+  #root {
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
+
+  /* 모바일(iOS Safari 등) 에디터 폼 입력 시 화면 자동 확대 방지 */
+  @media screen and (max-width: 640px) {
+    .editor-panel-container input[type='text'],
+    .editor-panel-container input[type='email'],
+    .editor-panel-container input[type='url'],
+    .editor-panel-container textarea,
+    .editor-panel-container select {
+      font-size: 16px;
+    }
+  }
+}
+
+/* 가로 스크롤바 숨김 유틸리티 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* 커스텀 스크롤바 */

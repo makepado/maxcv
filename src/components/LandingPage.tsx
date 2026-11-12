@@ -79,25 +79,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     <div className="min-h-screen bg-[#fafafa] text-zinc-950 flex flex-col selection:bg-zinc-900 selection:text-white">
       {/* 미니멀 상단 네비게이션 */}
       <header className="sticky top-0 z-30 bg-[#fafafa]/85 backdrop-blur-md border-b border-zinc-200/80">
-        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
           <a
             href="/"
-            className="flex items-center gap-2.5 group cursor-pointer transition-opacity hover:opacity-80"
+            className="flex items-center gap-2 sm:gap-2.5 group cursor-pointer transition-opacity hover:opacity-80"
             title="MaxCV 홈으로 이동"
           >
-            <div className="w-8 h-8 rounded-lg bg-zinc-950 group-hover:bg-zinc-800 text-white font-black text-sm flex items-center justify-center tracking-tighter transition-colors">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-950 group-hover:bg-zinc-800 text-white font-black text-xs sm:text-sm flex items-center justify-center tracking-tighter transition-colors">
               M
             </div>
-            <span className="font-extrabold text-lg tracking-tight text-zinc-950">MaxCV</span>
+            <span className="font-extrabold text-base sm:text-lg tracking-tight text-zinc-950">MaxCV</span>
           </a>
 
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={handleGoogleLoginClick}
-              className="px-4 py-2 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-xs cursor-pointer"
+              className="px-3.5 sm:px-4 py-2 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-xs cursor-pointer"
             >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
                   d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
@@ -123,8 +123,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
       {/* 히어로 섹션 */}
       <main className="flex-1">
-        <section className="max-w-4xl mx-auto px-6 pt-20 pb-16 sm:pt-28 sm:pb-24 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-zinc-200/80 shadow-2xs text-xs font-medium text-zinc-600 mb-8">
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-12 pb-12 sm:pt-28 sm:pb-24 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-zinc-200/80 shadow-2xs text-xs font-medium text-zinc-600 mb-6 sm:mb-8">
             <span className="relative flex h-2 w-2">
               <span className="animate-pulse-3s absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -133,7 +133,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           <h1
-            className="text-4xl sm:text-6xl font-extrabold tracking-tight text-zinc-950 leading-[1.15]"
+            className="text-[28px] xs:text-4xl sm:text-6xl font-extrabold tracking-tight text-zinc-950 leading-[1.2] sm:leading-[1.15]"
             style={{ wordBreak: 'keep-all' }}
           >
             노력 없이 완성하는
@@ -142,18 +142,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </h1>
 
           <p
-            className="mt-6 text-base sm:text-lg text-zinc-500 max-w-xl mx-auto leading-relaxed font-normal"
+            className="mt-4 sm:mt-6 text-sm sm:text-lg text-zinc-500 max-w-xl mx-auto leading-relaxed font-normal px-2"
             style={{ wordBreak: 'keep-all' }}
           >
             복잡한 편집 없이, 입력하면 그대로 완성되는 이력서
           </p>
 
           {/* 메인 CTA 버튼 영역 */}
-          <div className="mt-9 flex items-center justify-center">
+          <div className="mt-7 sm:mt-9 flex items-center justify-center">
             <button
               type="button"
               onClick={handleGoogleLoginClick}
-              className="px-7 py-3.5 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-sm shadow-lg shadow-zinc-950/10 flex items-center justify-center gap-3 transition-all cursor-pointer group"
+              className="w-full sm:w-auto max-w-xs sm:max-w-none px-6 sm:px-7 py-3.5 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-sm shadow-lg shadow-zinc-950/10 flex items-center justify-center gap-3 transition-all cursor-pointer group"
             >
               <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0">
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
@@ -182,28 +182,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </section>
 
         {/* 미니멀 인터페이스 프리뷰 목업 */}
-        <section className="max-w-5xl mx-auto px-6 pb-24">
-          <div className="rounded-3xl bg-white border border-zinc-200/90 shadow-2xl shadow-zinc-900/5 overflow-hidden">
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-16 sm:pb-24">
+          <div className="rounded-2xl sm:rounded-3xl bg-white border border-zinc-200/90 shadow-2xl shadow-zinc-900/5 overflow-hidden">
             {/* 브라우저 상단 바 */}
-            <div className="px-4 py-3 bg-zinc-50 border-b border-zinc-200/80 flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
+            <div className="px-3.5 sm:px-4 py-2.5 sm:py-3 bg-zinc-50 border-b border-zinc-200/80 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <span className="w-2.5 h-2.5 rounded-full bg-zinc-300" />
                 <span className="w-2.5 h-2.5 rounded-full bg-zinc-300" />
                 <span className="w-2.5 h-2.5 rounded-full bg-zinc-300" />
               </div>
-              <div className="text-[11px] font-mono text-zinc-400">maxcv.pages.dev — Workspace</div>
-              <div className="text-[11px] font-semibold text-zinc-500">A4 210 × 297 mm</div>
+              <div className="text-[11px] font-mono text-zinc-400 truncate">
+                maxcv.pages.dev — Workspace
+              </div>
+              <div className="hidden sm:block text-[11px] font-semibold text-zinc-500 shrink-0">
+                A4 210 × 297 mm
+              </div>
             </div>
 
             {/* 프리뷰 내부 2단 미니멀 쇼케이스 */}
             <div className="grid grid-cols-1 md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-zinc-200/80">
               {/* 좌측 컨트롤 요약 */}
-              <div className="md:col-span-5 p-6 sm:p-8 bg-zinc-50/40 space-y-5">
+              <div className="md:col-span-5 p-5 sm:p-8 bg-zinc-50/40 space-y-4 sm:space-y-5">
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
                     TYPOGRAPHY & LAYOUT ENGINE
                   </span>
-                  <h3 className="text-base font-bold text-zinc-900 mt-1">
+                  <h3 className="text-sm sm:text-base font-bold text-zinc-900 mt-1">
                     직무와 인상에 맞춘 세밀한 조판 제어
                   </h3>
                 </div>
@@ -212,7 +216,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   {fontShowcase.map((item, idx) => (
                     <div
                       key={idx}
-                      className="p-3.5 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs"
+                      className="p-3 sm:p-3.5 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs"
                     >
                       <div className="text-[10px] font-bold text-zinc-400 tracking-wider">
                         {item.category}
@@ -230,18 +234,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
 
               {/* 우측 A4 시트 미니멀 프리뷰 */}
-              <div className="md:col-span-7 p-6 sm:p-10 bg-white flex flex-col justify-between">
-                <div className="space-y-6">
-                  <div className="pb-5 border-b-2 border-zinc-900 flex items-baseline justify-between gap-4">
+              <div className="md:col-span-7 p-5 sm:p-10 bg-white flex flex-col justify-between">
+                <div className="space-y-5 sm:space-y-6">
+                  <div className="pb-4 sm:pb-5 border-b-2 border-zinc-900 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1.5 sm:gap-4">
                     <div>
-                      <h2 className="text-2xl font-extrabold tracking-tight text-zinc-950">
+                      <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-950">
                         김민준 (Minjun Kim)
                       </h2>
                       <p className="text-xs font-semibold text-zinc-500 mt-1">
                         Software Engineer
                       </p>
                     </div>
-                    <div className="text-right text-[11px] text-zinc-400 font-mono">
+                    <div className="text-left sm:text-right text-[11px] text-zinc-400 font-mono">
                       minjun.kim@maxcv.dev
                     </div>
                   </div>
@@ -251,7 +255,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-2">
                         PROFESSIONAL EXPERIENCE
                       </div>
-                      <div className="flex justify-between items-baseline">
+                      <div className="flex flex-wrap justify-between items-baseline gap-1">
                         <span className="text-sm font-bold text-zinc-900">
                           네오핀테크 (NeoFintech Corp.)
                         </span>
@@ -283,14 +287,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   </div>
                 </div>
 
-                <div className="mt-8 pt-4 border-t border-zinc-100 flex items-center justify-between">
+                <div className="mt-6 sm:mt-8 pt-4 border-t border-zinc-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                   <span className="text-xs text-zinc-400">
                     로그인 즉시 모든 템플릿과 폰트를 사용할 수 있습니다.
                   </span>
                   <button
                     type="button"
                     onClick={handleGoogleLoginClick}
-                    className="text-xs font-bold text-zinc-950 hover:underline flex items-center gap-1 cursor-pointer"
+                    className="text-xs font-bold text-zinc-950 hover:underline flex items-center gap-1 cursor-pointer self-start sm:self-auto"
                   >
                     <span>내 이력서 만들기</span>
                     <ArrowRight className="w-3.5 h-3.5" />

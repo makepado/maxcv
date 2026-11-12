@@ -84,25 +84,26 @@ export const CustomizePanel: React.FC = () => {
           컬럼 구조
         </h3>
 
-        <div className="grid grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-3 gap-2">
           {(
             [
-              { id: 'single', label: '1단 표준' },
-              { id: 'two-col-left', label: '2단 좌측 사이드바' },
-              { id: 'two-col-right', label: '2단 우측 사이드바' },
-            ] as { id: LayoutStructure; label: string }[]
+              { id: 'single', label: '1단 표준', shortLabel: '1단 표준' },
+              { id: 'two-col-left', label: '2단 좌측 사이드바', shortLabel: '2단 좌측' },
+              { id: 'two-col-right', label: '2단 우측 사이드바', shortLabel: '2단 우측' },
+            ] as { id: LayoutStructure; label: string; shortLabel: string }[]
           ).map((opt) => (
             <button
               key={opt.id}
               type="button"
               onClick={() => updateDesign({ layoutStructure: opt.id })}
-              className={`p-3 rounded-xl border text-center text-xs transition-all ${
+              className={`py-2.5 px-2 sm:p-3 rounded-xl border text-center text-xs transition-all ${
                 design.layoutStructure === opt.id
                   ? 'border-zinc-900 bg-zinc-900 text-white font-bold'
                   : 'border-zinc-200 text-zinc-700 hover:bg-zinc-50 font-medium'
               }`}
             >
-              {opt.label}
+              <span className="sm:hidden">{opt.shortLabel}</span>
+              <span className="hidden sm:inline">{opt.label}</span>
             </button>
           ))}
         </div>
@@ -127,7 +128,7 @@ export const CustomizePanel: React.FC = () => {
               />
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-4">
               <label className="text-xs font-semibold text-zinc-600 flex items-center gap-2">
                 <span>사이드바 배경</span>
                 <input
@@ -542,7 +543,7 @@ export const CustomizePanel: React.FC = () => {
           <label className="block text-xs font-semibold text-zinc-600 mb-1.5">
             헤더 정보 구분 기호
           </label>
-          <div className="grid grid-cols-5 gap-1.5">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-1.5">
             {[
               { id: 'none', label: '없음 (공백)' },
               { id: 'pipe', label: '| (파이프)' },
@@ -554,7 +555,7 @@ export const CustomizePanel: React.FC = () => {
                 key={sep.id}
                 type="button"
                 onClick={() => updateDesign({ headerSeparator: sep.id as any })}
-                className={`py-1.5 px-2 rounded-xl border text-xs font-semibold transition-all ${
+                className={`py-2 sm:py-1.5 px-2 rounded-xl border text-xs font-semibold transition-all ${
                   (design.headerSeparator || 'none') === sep.id
                     ? 'border-zinc-900 bg-zinc-900 text-white'
                     : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50'
@@ -567,7 +568,7 @@ export const CustomizePanel: React.FC = () => {
         </div>
 
         {/* 아이콘 및 표시 옵션 체크박스 */}
-        <div className="flex flex-wrap gap-4 pt-2 border-t border-zinc-100">
+        <div className="grid grid-cols-1 xs:grid-cols-2 sm:flex sm:flex-wrap gap-2.5 sm:gap-4 pt-2 border-t border-zinc-100">
           <label className="inline-flex items-center gap-2 text-xs font-medium text-zinc-700 cursor-pointer">
             <input
               type="checkbox"
@@ -696,12 +697,12 @@ export const CustomizePanel: React.FC = () => {
           })}
         </div>
 
-        <div className="pt-3 border-t border-zinc-100 space-y-2">
+        <div className="pt-3 border-t border-zinc-100 space-y-2.5">
           <div className="text-xs font-semibold text-zinc-600">
             색상 직접 커스텀
           </div>
-          <div className="flex flex-wrap items-center gap-6 text-xs font-semibold text-zinc-600">
-            <label className="flex items-center gap-2 cursor-pointer">
+          <div className="grid grid-cols-3 sm:flex sm:flex-wrap items-center gap-2.5 sm:gap-6 text-xs font-semibold text-zinc-600">
+            <label className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-2 cursor-pointer">
               <span>포인트 색상</span>
               <input
                 type="color"
@@ -711,7 +712,7 @@ export const CustomizePanel: React.FC = () => {
               />
             </label>
 
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-2 cursor-pointer">
               <span>본문 색상</span>
               <input
                 type="color"
@@ -721,7 +722,7 @@ export const CustomizePanel: React.FC = () => {
               />
             </label>
 
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-2 cursor-pointer">
               <span>보조 텍스트</span>
               <input
                 type="color"

@@ -179,43 +179,47 @@ export const ContentEditorPanel: React.FC = () => {
     return (
       <div
         key={section.id}
-        className={`bg-white rounded-2xl border transition-all shadow-2xs ${
+        className={`w-full overflow-hidden bg-white rounded-2xl border transition-all shadow-2xs ${
           section.visible ? 'border-zinc-200' : 'border-zinc-200/60 opacity-60'
         }`}
       >
         {/* 섹션 헤더 바 */}
-        <div className="flex items-center justify-between px-4 py-3.5 gap-2">
+        <div className="flex items-center justify-between px-3 sm:px-4 py-3 sm:py-3.5 gap-1.5 sm:gap-2 w-full overflow-hidden">
           <button
             type="button"
             onClick={() => toggleSectionAccordion(section.id)}
-            className="flex items-center gap-2.5 flex-1 text-left font-bold text-zinc-900 hover:text-zinc-600 transition-colors"
+            className="flex items-center gap-1.5 sm:gap-2 flex-1 w-0 min-w-0 overflow-hidden text-left font-bold text-zinc-900 hover:text-zinc-600 transition-colors"
           >
             {isOpen ? (
               <ChevronUp className="w-4 h-4 text-zinc-400 shrink-0" />
             ) : (
               <ChevronDown className="w-4 h-4 text-zinc-400 shrink-0" />
             )}
-            <span className="truncate">{section.title || `(제목 없음 · ${meta.labelKo})`}</span>
-            <span className="text-xs font-normal text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full">
+            <span className="truncate block min-w-0 text-sm sm:text-base">
+              {section.title || `(제목 없음 · ${meta.labelKo})`}
+            </span>
+            <span className="text-[11px] font-medium text-zinc-400 bg-zinc-100 px-1.5 py-0.5 rounded-full shrink-0">
               {section.items.length}
             </span>
           </button>
 
           {/* 섹션 컨트롤 버튼들 */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5 shrink-0">
             {isTwoCol && (
               <button
                 type="button"
                 onClick={() => toggleSectionColumn(section.id)}
                 title="메인 / 사이드바 전환"
-                className={`px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1 border transition-colors ${
+                className={`px-1.5 sm:px-2 py-1 rounded-md text-[11px] sm:text-xs font-medium flex items-center gap-1 border transition-colors ${
                   section.column === 'sidebar'
                     ? 'bg-zinc-900 text-white border-zinc-900'
                     : 'bg-zinc-50 text-zinc-600 border-zinc-200 hover:bg-zinc-100'
                 }`}
               >
                 <Columns className="w-3 h-3" />
-                {section.column === 'sidebar' ? '사이드바' : '메인'}
+                <span className="hidden sm:inline">
+                  {section.column === 'sidebar' ? '사이드바' : '메인'}
+                </span>
               </button>
             )}
 
@@ -224,7 +228,7 @@ export const ContentEditorPanel: React.FC = () => {
               onClick={() => moveSectionOrder(section.id, 'up')}
               disabled={secIdx === 0}
               title="위로"
-              className="p-1.5 text-zinc-400 hover:text-zinc-800 disabled:opacity-30 rounded-lg hover:bg-zinc-100"
+              className="p-1 sm:p-1.5 text-zinc-400 hover:text-zinc-800 disabled:opacity-30 rounded-lg hover:bg-zinc-100"
             >
               <ArrowUp className="w-3.5 h-3.5" />
             </button>
@@ -233,7 +237,7 @@ export const ContentEditorPanel: React.FC = () => {
               onClick={() => moveSectionOrder(section.id, 'down')}
               disabled={secIdx === doc.sections.length - 1}
               title="아래로"
-              className="p-1.5 text-zinc-400 hover:text-zinc-800 disabled:opacity-30 rounded-lg hover:bg-zinc-100"
+              className="p-1 sm:p-1.5 text-zinc-400 hover:text-zinc-800 disabled:opacity-30 rounded-lg hover:bg-zinc-100"
             >
               <ArrowDown className="w-3.5 h-3.5" />
             </button>
@@ -242,37 +246,37 @@ export const ContentEditorPanel: React.FC = () => {
               type="button"
               onClick={() => updateSection(section.id, { visible: !section.visible })}
               title={section.visible ? '숨기기' : '표시'}
-              className="p-1.5 text-zinc-400 hover:text-zinc-900 rounded-lg hover:bg-zinc-100"
+              className="p-1 sm:p-1.5 text-zinc-400 hover:text-zinc-900 rounded-lg hover:bg-zinc-100"
             >
-              {section.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+              {section.visible ? <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <EyeOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
             </button>
 
             <button
               type="button"
               onClick={() => removeSection(section.id)}
               title="삭제"
-              className="p-1.5 text-zinc-400 hover:text-rose-600 rounded-lg hover:bg-rose-50"
+              className="p-1 sm:p-1.5 text-zinc-400 hover:text-rose-600 rounded-lg hover:bg-rose-50"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           </div>
         </div>
 
         {/* 섹션 내부 편집 폼 */}
         {isOpen && (
-          <div className="px-4 pb-4 pt-2 border-t border-zinc-100 space-y-4">
+          <div className="px-3.5 sm:px-4 pb-4 pt-2 border-t border-zinc-100 space-y-4">
             {/* 섹션 제목 및 요소별 숨김 / 표시 토글 옵션 */}
             <div className="space-y-2.5">
-              <div className="flex items-center gap-2">
-                <label className="text-xs font-semibold text-zinc-500 w-20 shrink-0">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                <label className="text-xs font-semibold text-zinc-500 sm:w-20 shrink-0">
                   섹션 제목
                 </label>
                 <input
                   type="text"
                   value={section.title}
                   onChange={(e) => updateSection(section.id, { title: e.target.value })}
-                  className="flex-1 text-sm px-3 py-1.5 rounded-lg border border-zinc-200 focus:border-zinc-900 outline-none"
-                  placeholder="섹션 제목 (비우거나 숨기면 아랫줄과 아이콘도 숨겨집니다)"
+                  className="flex-1 min-w-0 text-sm px-3 py-1.5 rounded-lg border border-zinc-200 focus:border-zinc-900 outline-none"
+                  placeholder="섹션 제목 (비우거나 숨기면 밑줄·아이콘도 숨김)"
                 />
               </div>
 
@@ -345,16 +349,16 @@ export const ContentEditorPanel: React.FC = () => {
                   }`}
                 >
                   {/* 항목 상단 툴바 */}
-                  <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-zinc-200/70">
-                    <span className="text-xs font-semibold text-zinc-700 truncate max-w-[220px]">
+                  <div className="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-zinc-200/70">
+                    <span className="text-xs font-semibold text-zinc-700 truncate min-w-0 flex-1">
                       #{itemIdx + 1} {item.title || meta.labelKo}
                     </span>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
                       <button
                         type="button"
                         onClick={() => moveSectionItemOrder(section.id, item.id, 'up')}
                         disabled={itemIdx === 0}
-                        className="p-1 text-zinc-400 hover:text-zinc-800 disabled:opacity-30"
+                        className="p-1.5 sm:p-1 text-zinc-400 hover:text-zinc-800 disabled:opacity-30"
                         title="위로"
                       >
                         <ArrowUp className="w-3.5 h-3.5" />
@@ -363,7 +367,7 @@ export const ContentEditorPanel: React.FC = () => {
                         type="button"
                         onClick={() => moveSectionItemOrder(section.id, item.id, 'down')}
                         disabled={itemIdx === section.items.length - 1}
-                        className="p-1 text-zinc-400 hover:text-zinc-800 disabled:opacity-30"
+                        className="p-1.5 sm:p-1 text-zinc-400 hover:text-zinc-800 disabled:opacity-30"
                         title="아래로"
                       >
                         <ArrowDown className="w-3.5 h-3.5" />
@@ -371,7 +375,7 @@ export const ContentEditorPanel: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => duplicateSectionItem(section.id, item.id)}
-                        className="p-1 text-zinc-400 hover:text-zinc-900"
+                        className="p-1.5 sm:p-1 text-zinc-400 hover:text-zinc-900"
                         title="복제"
                       >
                         <Copy className="w-3.5 h-3.5" />
@@ -381,7 +385,7 @@ export const ContentEditorPanel: React.FC = () => {
                         onClick={() =>
                           updateSectionItem(section.id, item.id, { visible: !item.visible })
                         }
-                        className="p-1 text-zinc-400 hover:text-zinc-900"
+                        className="p-1.5 sm:p-1 text-zinc-400 hover:text-zinc-900"
                         title={item.visible ? '숨기기' : '보이기'}
                       >
                         {item.visible ? (
@@ -393,7 +397,7 @@ export const ContentEditorPanel: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => removeSectionItem(section.id, item.id)}
-                        className="p-1 text-zinc-400 hover:text-rose-600"
+                        className="p-1.5 sm:p-1 text-zinc-400 hover:text-rose-600"
                         title="삭제"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -557,7 +561,7 @@ export const ContentEditorPanel: React.FC = () => {
                                 updateSectionItem(section.id, item.id, { urlLabel: e.target.value })
                               }
                               placeholder="라벨"
-                              className="w-2/5 text-sm px-2 py-1.5 rounded-lg bg-white border border-zinc-200 focus:border-zinc-900 outline-none"
+                              className="w-2/5 min-w-0 text-sm px-2 py-1.5 rounded-lg bg-white border border-zinc-200 focus:border-zinc-900 outline-none"
                             />
                             <input
                               type="url"
@@ -566,7 +570,7 @@ export const ContentEditorPanel: React.FC = () => {
                                 updateSectionItem(section.id, item.id, { url: e.target.value })
                               }
                               placeholder="https://..."
-                              className="w-3/5 text-sm px-2 py-1.5 rounded-lg bg-white border border-zinc-200 focus:border-zinc-900 outline-none"
+                              className="w-3/5 min-w-0 text-sm px-2 py-1.5 rounded-lg bg-white border border-zinc-200 focus:border-zinc-900 outline-none"
                             />
                           </div>
                         </div>
@@ -772,9 +776,9 @@ export const ContentEditorPanel: React.FC = () => {
         </button>
 
         {personalOpen && (
-          <div className="p-4 border-t border-zinc-100 space-y-4">
+          <div className="p-3.5 sm:p-4 border-t border-zinc-100 space-y-4">
             {/* 프로필 사진 업로드 및 모양 설정 */}
-            <div className="flex flex-wrap items-center gap-4 p-3 rounded-xl bg-zinc-50 border border-zinc-200/80">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 p-3 rounded-xl bg-zinc-50 border border-zinc-200/80">
               <div className="flex items-center gap-3">
                 {doc.personal.photoUrl ? (
                   <img
@@ -821,7 +825,7 @@ export const ContentEditorPanel: React.FC = () => {
               </div>
 
               {doc.personal.showPhoto && (
-                <div className="flex flex-wrap items-center gap-3 ml-auto text-xs">
+                <div className="w-full sm:w-auto sm:ml-auto pt-2.5 sm:pt-0 border-t sm:border-t-0 border-zinc-200/70 flex flex-wrap items-center justify-between sm:justify-end gap-2.5 sm:gap-3 text-xs">
                   <select
                     value={doc.personal.photoShape}
                     onChange={(e) =>
@@ -967,45 +971,59 @@ export const ContentEditorPanel: React.FC = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2.5 sm:space-y-2">
                 {doc.personal.links.map((link) => (
-                  <div key={link.id} className="flex items-center gap-2">
-                    <select
-                      value={link.platform}
-                      onChange={(e) =>
-                        updateSocialLink(link.id, {
-                          platform: e.target.value as SocialLink['platform'],
-                        })
-                      }
-                      className="text-xs px-2 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50"
-                    >
-                      <option value="github">GitHub</option>
-                      <option value="linkedin">LinkedIn</option>
-                      <option value="website">Website</option>
-                      <option value="blog">Blog</option>
-                      <option value="velog">Velog</option>
-                      <option value="notion">Notion</option>
-                      <option value="scholar">Scholar</option>
-                      <option value="other">기타</option>
-                    </select>
-                    <input
-                      type="text"
-                      value={link.label}
-                      onChange={(e) => updateSocialLink(link.id, { label: e.target.value })}
-                      placeholder="표시 텍스트"
-                      className="flex-1 text-xs px-2.5 py-1.5 rounded-lg border border-zinc-200"
-                    />
+                  <div
+                    key={link.id}
+                    className="flex flex-col sm:flex-row sm:items-center gap-2 p-2.5 sm:p-0 rounded-xl sm:rounded-none bg-zinc-50/80 sm:bg-transparent border sm:border-0 border-zinc-200/70"
+                  >
+                    <div className="flex items-center gap-2 sm:contents">
+                      <select
+                        value={link.platform}
+                        onChange={(e) =>
+                          updateSocialLink(link.id, {
+                            platform: e.target.value as SocialLink['platform'],
+                          })
+                        }
+                        className="text-xs px-2 py-1.5 rounded-lg border border-zinc-200 bg-white sm:bg-zinc-50 shrink-0"
+                      >
+                        <option value="github">GitHub</option>
+                        <option value="linkedin">LinkedIn</option>
+                        <option value="website">Website</option>
+                        <option value="blog">Blog</option>
+                        <option value="velog">Velog</option>
+                        <option value="notion">Notion</option>
+                        <option value="scholar">Scholar</option>
+                        <option value="other">기타</option>
+                      </select>
+                      <input
+                        type="text"
+                        value={link.label}
+                        onChange={(e) => updateSocialLink(link.id, { label: e.target.value })}
+                        placeholder="표시 텍스트"
+                        className="flex-1 min-w-0 text-xs px-2.5 py-1.5 rounded-lg bg-white border border-zinc-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeSocialLink(link.id)}
+                        className="p-1.5 sm:hidden text-zinc-400 hover:text-rose-600 shrink-0"
+                        title="삭제"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                     <input
                       type="url"
                       value={link.url}
                       onChange={(e) => updateSocialLink(link.id, { url: e.target.value })}
                       placeholder="https://..."
-                      className="flex-1 text-xs px-2.5 py-1.5 rounded-lg border border-zinc-200"
+                      className="w-full sm:flex-1 min-w-0 text-xs px-2.5 py-1.5 rounded-lg bg-white border border-zinc-200"
                     />
                     <button
                       type="button"
                       onClick={() => removeSocialLink(link.id)}
-                      className="p-1 text-zinc-400 hover:text-rose-600"
+                      className="hidden sm:inline-flex p-1 text-zinc-400 hover:text-rose-600 shrink-0"
+                      title="삭제"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -1025,7 +1043,7 @@ export const ContentEditorPanel: React.FC = () => {
                         })
                       }
                       placeholder="항목명"
-                      className="w-28 text-xs px-2.5 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50"
+                      className="w-24 sm:w-28 min-w-0 text-xs px-2.5 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50"
                     />
                     <input
                       type="text"
@@ -1038,7 +1056,7 @@ export const ContentEditorPanel: React.FC = () => {
                         })
                       }
                       placeholder="내용"
-                      className="flex-1 text-xs px-2.5 py-1.5 rounded-lg border border-zinc-200"
+                      className="flex-1 min-w-0 text-xs px-2.5 py-1.5 rounded-lg border border-zinc-200"
                     />
                     <button
                       type="button"
@@ -1049,7 +1067,7 @@ export const ContentEditorPanel: React.FC = () => {
                           ),
                         })
                       }
-                      className="p-1 text-zinc-400 hover:text-rose-600"
+                      className="p-1.5 sm:p-1 text-zinc-400 hover:text-rose-600 shrink-0"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
