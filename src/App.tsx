@@ -97,45 +97,6 @@ export function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // 키보드 단축키 (Ctrl+Z / Cmd+Z = 뒤로가기, Ctrl+Y / Cmd+Shift+Z = 다시실행)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
-      const isCmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
-      if (!isCmdOrCtrl) return;
-
-      const target = e.target as HTMLElement | null;
-      // 인풋 텍스트 필드 안에서 입력 중인 기본 브라우저 실행은 방해하지 않음
-      const isInput =
-        target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
-
-      if (e.key.toLowerCase() === 'z') {
-        if (e.shiftKey) {
-          // Redo
-          if (!isInput && canRedo) {
-            e.preventDefault();
-            redo();
-          }
-        } else {
-          // Undo
-          if (!isInput && canUndo) {
-            e.preventDefault();
-            undo();
-          }
-        }
-      } else if (e.key.toLowerCase() === 'y') {
-        // Redo on Windows
-        if (!isInput && canRedo) {
-          e.preventDefault();
-          redo();
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [canUndo, canRedo, undo, redo]);
-
   // 모바일 화면 크기 변경 시 수동 줌 초기화하여 화면 맞춤 유지
   useEffect(() => {
     if (windowWidth >= 1024) {
@@ -402,7 +363,7 @@ export function App() {
                   ? 'text-zinc-800 hover:bg-white hover:shadow-2xs cursor-pointer'
                   : 'text-zinc-300 cursor-not-allowed'
               }`}
-              title="실행 취소 / 뒤로가기 (Ctrl+Z / ⌘Z)"
+              title="실행 취소"
             >
               <Undo2 className="w-4 h-4" />
             </button>
@@ -415,7 +376,7 @@ export function App() {
                   ? 'text-zinc-800 hover:bg-white hover:shadow-2xs cursor-pointer'
                   : 'text-zinc-300 cursor-not-allowed'
               }`}
-              title="다시 실행 (Ctrl+Y / ⌘⇧Z)"
+              title="다시 실행"
             >
               <Redo2 className="w-4 h-4" />
             </button>
