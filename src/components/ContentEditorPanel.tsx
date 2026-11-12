@@ -15,6 +15,9 @@ import {
   Camera,
   Sparkles,
   Tag,
+  Bold,
+  Italic,
+  Underline,
 } from 'lucide-react';
 import { useCVStore } from '../store/useCVStore';
 import { SECTION_CATALOG } from '../constants/defaultCv';
@@ -112,12 +115,92 @@ export const ContentEditorPanel: React.FC = () => {
     });
   };
 
-  // 엔터(Enter) 키 입력 시 현재 줄이 불릿으로 시작하는 경우에만 다음 줄에 불릿을 자동 삽입
+  // 텍스트 서식 래퍼 적용 (볼드 **, 기울임 *, 밑줄 <u></u>)
+  const applyFormatWrapper = (
+    textarea: HTMLTextAreaElement | null,
+    sectionId: string,
+    itemId: string,
+    prefix: string,
+    suffix: string,
+    placeholder: string
+  ) => {
+    if (!textarea) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const val = textarea.value || '';
+    const selected = val.substring(start, end);
+
+    let nextVal = '';
+    let newStart = 0;
+    let newEnd = 0;
+
+    if (selected.length > 0) {
+      // 선택 영역이 이미 prefix/suffix로 감싸져 있으면 제거(토글), 아니면 감싸기
+      if (
+        val.substring(start - prefix.length, start) === prefix &&
+        val.substring(end, end + suffix.length) === suffix
+      ) {
+        // 앞뒤 마크 제거
+        const before = val.substring(0, start - prefix.length);
+        const after = val.substring(end + suffix.length);
+        nextVal = before + selected + after;
+        newStart = start - prefix.length;
+        newEnd = newStart + selected.length;
+      } else {
+        // 감싸기
+        const before = val.substring(0, start);
+        const after = val.substring(end);
+        nextVal = before + prefix + selected + suffix + after;
+        newStart = start + prefix.length;
+        newEnd = newStart + selected.length;
+      }
+    } else {
+      // 선택 영역이 없으면 플레이스홀더를 감싸서 삽입
+      const before = val.substring(0, start);
+      const after = val.substring(end);
+      nextVal = before + prefix + placeholder + suffix + after;
+      newStart = start + prefix.length;
+      newEnd = newStart + placeholder.length;
+    }
+
+    updateSectionItem(sectionId, itemId, { description: nextVal });
+
+    requestAnimationFrame(() => {
+      textarea.focus();
+      textarea.setSelectionRange(newStart, newEnd);
+    });
+  };
+
+  // 엔터(Enter) 자동 불릿 및 서식 단축키(Ctrl+B, Ctrl+I, Ctrl+U)
   const handleDescriptionKeyDown = (
     e: React.KeyboardEvent<HTMLTextAreaElement>,
     sectionId: string,
     item: SectionItem
   ) => {
+    const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+    const isCtrlOrCmd = isMac ? e.metaKey : e.ctrlKey;
+
+    // 단축키: Ctrl/Cmd + B (볼드)
+    if (isCtrlOrCmd && e.key.toLowerCase() === 'b') {
+      e.preventDefault();
+      applyFormatWrapper(e.currentTarget, sectionId, item.id, '**', '**', '굵은 텍스트');
+      return;
+    }
+
+    // 단축키: Ctrl/Cmd + I (기울임)
+    if (isCtrlOrCmd && e.key.toLowerCase() === 'i') {
+      e.preventDefault();
+      applyFormatWrapper(e.currentTarget, sectionId, item.id, '*', '*', '기울임 텍스트');
+      return;
+    }
+
+    // 단축키: Ctrl/Cmd + U (밑줄)
+    if (isCtrlOrCmd && e.key.toLowerCase() === 'u') {
+      e.preventDefault();
+      applyFormatWrapper(e.currentTarget, sectionId, item.id, '<u>', '</u>', '밑줄 텍스트');
+      return;
+    }
+
     if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
       const target = e.currentTarget;
       const start = target.selectionStart;
@@ -615,10 +698,10 @@ export const ContentEditorPanel: React.FC = () => {
                       </>
                     )}
 
-                    {/* 상세 내용 (엔터 입력 시 • 불릿 자동 삽입) */}
+                    {/* 상세 내용 (엔터 입력 시 • 불릿 자동 삽입 및 서식 B/I/U 지원) */}
                     {section.type !== 'skills' && section.type !== 'languages' && (
                       <div className="sm:col-span-2">
-                        <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center justify-between mb-1.5 flex-wrap gap-1.5">
                           <div className="flex items-center gap-2">
                             <label className="text-[11px] font-medium text-zinc-500">
                               상세 내용
@@ -650,18 +733,59 @@ export const ContentEditorPanel: React.FC = () => {
                               )}
                             </button>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const prefix = item.description ? `${item.description}\n• ` : '• ';
-                              updateSectionItem(section.id, item.id, { description: prefix });
-                            }}
-                            className="text-[11px] text-zinc-700 hover:text-zinc-950 font-semibold"
-                          >
-                            + 불릿 추가
-                          </button>
+
+                          {/* 텍스트 서식 툴바 (볼드, 기울임, 밑줄, 불릿 추가) */}
+                          <div className="flex items-center gap-1">
+                            <div className="flex items-center bg-zinc-100 rounded-md p-0.5 border border-zinc-200">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const el = document.getElementById(`desc-textarea-${item.id}`) as HTMLTextAreaElement | null;
+                                  if (el) applyFormatWrapper(el, section.id, item.id, '**', '**', '굵은 텍스트');
+                                }}
+                                className="w-6 h-6 flex items-center justify-center rounded text-xs font-bold text-zinc-700 hover:text-zinc-950 hover:bg-white transition-colors"
+                                title="굵게 / 볼드 (Ctrl+B)"
+                              >
+                                <span className="font-extrabold text-[13px] leading-none">B</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const el = document.getElementById(`desc-textarea-${item.id}`) as HTMLTextAreaElement | null;
+                                  if (el) applyFormatWrapper(el, section.id, item.id, '*', '*', '기울임 텍스트');
+                                }}
+                                className="w-6 h-6 flex items-center justify-center rounded text-xs italic font-serif text-zinc-700 hover:text-zinc-950 hover:bg-white transition-colors"
+                                title="기울임 / 이탤릭 (Ctrl+I)"
+                              >
+                                <span className="italic font-serif text-[13px] leading-none">I</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const el = document.getElementById(`desc-textarea-${item.id}`) as HTMLTextAreaElement | null;
+                                  if (el) applyFormatWrapper(el, section.id, item.id, '<u>', '</u>', '밑줄 텍스트');
+                                }}
+                                className="w-6 h-6 flex items-center justify-center rounded text-xs text-zinc-700 hover:text-zinc-950 hover:bg-white transition-colors"
+                                title="밑줄 (Ctrl+U)"
+                              >
+                                <span className="underline underline-offset-2 font-semibold text-[13px] leading-none">U</span>
+                              </button>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const prefix = item.description ? `${item.description}\n• ` : '• ';
+                                updateSectionItem(section.id, item.id, { description: prefix });
+                              }}
+                              className="text-[11px] text-zinc-700 hover:text-zinc-950 font-semibold px-2 py-0.5 rounded hover:bg-zinc-100 transition-colors"
+                            >
+                              + 불릿 추가
+                            </button>
+                          </div>
                         </div>
                         <textarea
+                          id={`desc-textarea-${item.id}`}
                           rows={3}
                           value={item.description}
                           onKeyDown={(e) => handleDescriptionKeyDown(e, section.id, item)}
@@ -670,7 +794,7 @@ export const ContentEditorPanel: React.FC = () => {
                               description: e.target.value,
                             })
                           }
-                          placeholder="• 주요 내용 입력 (불릿 줄에서 Enter 입력 시 다음 줄 불릿 자동 생성)"
+                          placeholder="• 주요 내용 입력 (텍스트 드래그 후 B/I/U 또는 Ctrl+B/I/U로 서식 적용)"
                           className={`w-full text-sm px-3 py-2 rounded-lg border focus:border-zinc-900 outline-none leading-relaxed ${
                             item.hideDescription || section.hideItemDescription
                               ? 'bg-zinc-100/80 text-zinc-400 border-zinc-200'

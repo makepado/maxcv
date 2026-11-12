@@ -36,6 +36,7 @@ import {
   SocialLink,
 } from '../types/cv';
 import { getFontById } from '../constants/fonts';
+import { renderInlineFormattedText } from '../utils/formatMarkdown';
 
 interface CVPreviewCanvasProps {
   doc: CVDocument;
@@ -155,12 +156,14 @@ function renderFormattedDescription(text: string, bulletStyle: BulletStyle = 'bu
           ? trimmed.replace(/^([•\-–▪*]|\d+\.)\s*/, '')
           : trimmed;
 
+        const formattedContent = renderInlineFormattedText(cleanText);
+
         if (isBullet) {
           bulletCounter++;
           if (bulletStyle === 'none') {
             return (
               <p key={i} className="pl-1">
-                {cleanText}
+                {formattedContent}
               </p>
             );
           }
@@ -179,11 +182,11 @@ function renderFormattedDescription(text: string, bulletStyle: BulletStyle = 'bu
               >
                 {bulletChar}
               </span>
-              <span className="flex-1">{cleanText}</span>
+              <span className="flex-1">{formattedContent}</span>
             </div>
           );
         }
-        return <p key={i}>{cleanText}</p>;
+        return <p key={i}>{formattedContent}</p>;
       })}
     </div>
   );
