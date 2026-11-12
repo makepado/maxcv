@@ -32,7 +32,7 @@ interface CreateDocumentModalProps {
 const RESUME_METAS = [
   {
     id: 'sample-resume-developer',
-    role: '개발자 (Frontend / Software)',
+    role: '프론트엔드 및 소프트웨어 엔지니어',
     badge: 'IT / Tech',
     summary: '프론트엔드 아키텍처 및 디자인 시스템, LCP 48% 개선 및 배포 주기 단축',
     icon: <Code className="w-4 h-4 text-sky-600" />,
@@ -41,7 +41,7 @@ const RESUME_METAS = [
   },
   {
     id: 'sample-resume-pm',
-    role: '프로덕트 매니저 (PO / PM)',
+    role: '프로덕트 매니저',
     badge: 'Product',
     summary: '1-Click 간편결제 런칭, GMV 420억 견인, A/B 테스트 기반 퍼널 최적화',
     icon: <LayoutGrid className="w-4 h-4 text-teal-600" />,
@@ -50,7 +50,7 @@ const RESUME_METAS = [
   },
   {
     id: 'sample-resume-designer',
-    role: '프로덕트 디자이너 (UI/UX)',
+    role: '프로덕트 디자이너',
     badge: 'Design',
     summary: '토큰 기반 크로스 플랫폼 디자인 시스템(Aura DS) 구축, 결제 완료율 8.7% 개선',
     icon: <Palette className="w-4 h-4 text-indigo-600" />,
@@ -59,7 +59,7 @@ const RESUME_METAS = [
   },
   {
     id: 'sample-resume-marketer',
-    role: '그로스 마케터 (Growth)',
+    role: '그로스 마케터',
     badge: 'Marketing',
     summary: '월 예산 4억 멀티채널 집행, CAC 42% 절감, CRM 자동화로 30일 리텐션 31.2%',
     icon: <TrendingUp className="w-4 h-4 text-orange-600" />,
@@ -68,7 +68,7 @@ const RESUME_METAS = [
   },
   {
     id: 'sample-resume-business',
-    role: '전략기획 및 사업개발 (BD)',
+    role: '전략기획 및 사업개발',
     badge: 'Business',
     summary: '대기업 12건 제휴 체결로 연 매출 180억 창출, B2B 카셰어링 구독 모델 런칭',
     icon: <LineChart className="w-4 h-4 text-blue-600" />,
@@ -80,7 +80,7 @@ const RESUME_METAS = [
 const CAREER_METAS = [
   {
     id: 'sample-career-backend',
-    role: '백엔드 / 클라우드 엔지니어',
+    role: '백엔드 및 클라우드 엔지니어',
     badge: 'Backend',
     summary: '피크 TPS 35,000 분산 락/큐잉 시스템 구축, 정산 배치 88% 단축 파이프라인',
     icon: <Server className="w-4 h-4 text-slate-700" />,
@@ -89,7 +89,7 @@ const CAREER_METAS = [
   },
   {
     id: 'sample-career-frontend',
-    role: '프론트엔드 / 웹 엔지니어',
+    role: '프론트엔드 및 웹 엔지니어',
     badge: 'Frontend',
     summary: '마이크로 프론트엔드 독립 배포 전환(일 12회), Web Vitals 최적화(LCP 1.4s)',
     icon: <Code className="w-4 h-4 text-blue-600" />,
@@ -98,7 +98,7 @@ const CAREER_METAS = [
   },
   {
     id: 'sample-career-pm',
-    role: '프로덕트 매니저 (PO / PM)',
+    role: '프로덕트 매니저',
     badge: 'Product',
     summary: '1-Click 간편결제 생체인증 여정 단축, ML 홈 피드 개인화(GMV 38% 성장)',
     icon: <Compass className="w-4 h-4 text-teal-600" />,
@@ -107,7 +107,7 @@ const CAREER_METAS = [
   },
   {
     id: 'sample-career-data',
-    role: '데이터 엔지니어 / 분석가',
+    role: '데이터 엔지니어 및 분석가',
     badge: 'Data',
     summary: '일 1.2억 건 이벤트 수집, Apache Iceberg 레이크하우스 구축 및 쿼리 비용 52% 절감',
     icon: <Database className="w-4 h-4 text-indigo-600" />,
@@ -116,7 +116,7 @@ const CAREER_METAS = [
   },
   {
     id: 'sample-career-biz',
-    role: '전략기획 및 사업개발 (BD)',
+    role: '전략기획 및 사업개발',
     badge: 'Business',
     summary: 'B2B 법인 카셰어링 120개사 유치, 차량 가동률 32%→68% 개선, 연 ARR 85억',
     icon: <Layers className="w-4 h-4 text-blue-700" />,

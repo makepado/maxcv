@@ -38,10 +38,10 @@ export const RESUME_JOB_SAMPLES: CVDocument[] = [
     name: '김민준 — 시니어 프론트엔드 엔지니어',
   },
 
-  // 2. 프로덕트 매니저 (PO / PM)
+  // 2. 프로덕트 매니저
   {
     id: 'sample-resume-pm',
-    name: '박서현 — 프로덕트 매니저 (PO)',
+    name: '박서현 — 프로덕트 매니저',
     updatedAt: new Date().toISOString(),
     language: 'ko',
     personal: {
@@ -181,10 +181,10 @@ export const RESUME_JOB_SAMPLES: CVDocument[] = [
     },
   },
 
-  // 3. 프로덕트 디자이너 (UI/UX)
+  // 3. 프로덕트 디자이너
   {
     id: 'sample-resume-designer',
-    name: '이지우 — 프로덕트 디자이너 (UI/UX)',
+    name: '이지우 — 프로덕트 디자이너',
     updatedAt: new Date().toISOString(),
     language: 'ko',
     personal: {
@@ -326,10 +326,10 @@ export const RESUME_JOB_SAMPLES: CVDocument[] = [
     },
   },
 
-  // 4. 마케터 / 그로스 (Growth Marketer)
+  // 4. 마케터 / 그로스
   {
     id: 'sample-resume-marketer',
-    name: '최현우 — 그로스 마케터 (Growth Marketer)',
+    name: '최현우 — 그로스 마케터',
     updatedAt: new Date().toISOString(),
     language: 'ko',
     personal: {
@@ -464,10 +464,10 @@ export const RESUME_JOB_SAMPLES: CVDocument[] = [
     },
   },
 
-  // 5. 비즈니스 / 전략 기획 (Business Development & Strategy)
+  // 5. 비즈니스 / 전략 기획
   {
     id: 'sample-resume-business',
-    name: '정유진 — 전략기획 및 사업개발 (BD)',
+    name: '정유진 — 전략기획 및 사업개발',
     updatedAt: new Date().toISOString(),
     language: 'ko',
     personal: {

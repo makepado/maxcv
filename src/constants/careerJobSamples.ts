@@ -232,10 +232,10 @@ export const CAREER_JOB_SAMPLES: CVDocument[] = [
     design: { ...CAREER_BASE_DESIGN, accentColor: '#2563eb' },
   },
 
-  // 3. 프로덕트 매니저 (PO / Service PM)
+  // 3. 프로덕트 매니저
   {
     id: 'sample-career-pm',
-    name: '박서현 — 프로덕트 매니저 (PO) 경력기술서',
+    name: '박서현 — 프로덕트 매니저 경력기술서',
     updatedAt: new Date().toISOString(),
     language: 'ko',
     docType: 'career',
