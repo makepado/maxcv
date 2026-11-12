@@ -146,8 +146,6 @@ export const LoggedInHomeDashboard: React.FC<LoggedInHomeDashboardProps> = ({
 
   // 대분류 탭: 이력서 vs 경력기술서
   const [activeCategory, setActiveCategory] = useState<'resume' | 'career'>('resume');
-  // 소분류 하위 모드: 'samples' vs 'blank'
-  const [subMode, setSubMode] = useState<'samples' | 'blank'>('samples');
 
   const currentCards = activeCategory === 'resume' ? RESUME_SAMPLE_CARDS : CAREER_SAMPLE_CARDS;
   const currentSampleDocs = activeCategory === 'resume' ? RESUME_JOB_SAMPLES : CAREER_JOB_SAMPLES;
@@ -191,7 +189,7 @@ export const LoggedInHomeDashboard: React.FC<LoggedInHomeDashboardProps> = ({
               반갑습니다, {currentUser.name}님 👋
             </h1>
             <p className="text-xs sm:text-sm text-zinc-500">
-              원하는 문서 종류와 직군별 샘플을 선택하여 바로 수정을 시작하세요.
+              새 문서를 작성하거나 직군별 추천 샘플을 선택하여 바로 수정을 시작하세요.
             </p>
           </div>
 
@@ -217,15 +215,12 @@ export const LoggedInHomeDashboard: React.FC<LoggedInHomeDashboardProps> = ({
 
         {/* 탭: 이력서 vs 경력기술서 */}
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-200 pb-3">
-            {/* 상위 대분류 탭 버튼 */}
+          <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
+            {/* 상위 대분류 탭 버튼 (괄호 제거 및 간결한 구성) */}
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => {
-                  setActiveCategory('resume');
-                  setSubMode('samples');
-                }}
+                onClick={() => setActiveCategory('resume')}
                 className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-2 transition-all cursor-pointer ${
                   activeCategory === 'resume'
                     ? 'bg-zinc-950 text-white shadow-xs'
@@ -233,14 +228,11 @@ export const LoggedInHomeDashboard: React.FC<LoggedInHomeDashboardProps> = ({
                 }`}
               >
                 <FileText className="w-4 h-4" />
-                <span>이력서 (Resume)</span>
+                <span>이력서</span>
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setActiveCategory('career');
-                  setSubMode('samples');
-                }}
+                onClick={() => setActiveCategory('career')}
                 className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-2 transition-all cursor-pointer ${
                   activeCategory === 'career'
                     ? 'bg-indigo-950 text-white shadow-xs'
@@ -248,135 +240,114 @@ export const LoggedInHomeDashboard: React.FC<LoggedInHomeDashboardProps> = ({
                 }`}
               >
                 <Briefcase className="w-4 h-4 text-indigo-400" />
-                <span>경력기술서 (Projects)</span>
-              </button>
-            </div>
-
-            {/* 하위 소분류: 직군별 샘플 vs 빈 문서 선택 */}
-            <div className="flex items-center gap-1.5 bg-zinc-100 p-1 rounded-xl self-start sm:self-auto border border-zinc-200/80">
-              <button
-                type="button"
-                onClick={() => setSubMode('samples')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                  subMode === 'samples'
-                    ? 'bg-white text-zinc-950 shadow-2xs'
-                    : 'text-zinc-500 hover:text-zinc-900'
-                }`}
-              >
-                <Sparkles className="w-3.5 h-3.5 text-zinc-700" />
-                <span>직군별 샘플 (5종)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setSubMode('blank')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                  subMode === 'blank'
-                    ? 'bg-white text-zinc-950 shadow-2xs'
-                    : 'text-zinc-500 hover:text-zinc-900'
-                }`}
-              >
-                <Plus className="w-3.5 h-3.5 text-zinc-700" />
-                <span>{activeCategory === 'resume' ? '빈 이력서' : '빈 경력기술서'}</span>
+                <span>경력기술서</span>
               </button>
             </div>
           </div>
 
-          {/* 소분류 1: 빈 문서 생성 선택 시 */}
-          {subMode === 'blank' ? (
-            <div className="p-8 sm:p-12 rounded-2xl sm:rounded-3xl border-2 border-dashed border-zinc-300 hover:border-zinc-900 bg-white transition-all text-center flex flex-col items-center justify-center gap-3">
-              <div className="w-14 h-14 rounded-2xl bg-zinc-100 flex items-center justify-center">
-                {activeCategory === 'resume' ? (
-                  <FileText className="w-7 h-7 text-zinc-800" />
-                ) : (
-                  <Briefcase className="w-7 h-7 text-indigo-700" />
-                )}
-              </div>
-              <h3 className="text-base sm:text-lg font-black text-zinc-950">
-                {activeCategory === 'resume' ? '새 빈 이력서 생성' : '새 빈 경력기술서 생성'}
-              </h3>
-              <p className="text-xs sm:text-sm text-zinc-500 max-w-md mx-auto leading-relaxed">
-                {activeCategory === 'resume'
-                  ? '표준 레이아웃(인적사항, 학력, 경력, 보유 기술)의 백지 템플릿으로 시작하여 자유롭게 기재합니다.'
-                  : '프로젝트 단위(배경, 역할, 수행 내용, 정량 성과)가 체계적으로 잡힌 백지 템플릿으로 시작합니다.'}
-              </p>
-              <button
-                type="button"
-                onClick={handleCreateBlank}
-                className="mt-3 px-6 py-3 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer shadow-md transition-all"
-              >
-                <span>빈 문서 만들고 편집하기</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+          {/* 새 문서 만들기 카드 + 대표 직군 5종 샘플 통합 그리드 */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-xs text-zinc-500 px-1">
+              <span>
+                <strong>{activeCategory === 'resume' ? '이력서' : '경력기술서'}</strong> 작성: 빈 문서로 시작하거나 대표 샘플 5종을 불러옵니다.
+              </span>
             </div>
-          ) : (
-            /* 소분류 2: 직군별 대표 5개 샘플 카드 그리드 */
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-xs text-zinc-500 px-1">
-                <span>
-                  <strong>{activeCategory === 'resume' ? '이력서' : '경력기술서'}</strong> 대표 5개
-                  직군별 샘플:
-                </span>
-                <span className="text-zinc-400">카드를 누르면 복사되어 바로 편집 창이 열립니다</span>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {/* 첫 번째 카드: 새 빈 문서 시작 (클릭 즉시 빈 문서 생성 후 에디터 진입) */}
+              <div
+                onClick={handleCreateBlank}
+                className="group p-5 rounded-2xl border-2 border-dashed border-zinc-300 hover:border-zinc-950 bg-white/90 hover:bg-zinc-50/80 transition-all cursor-pointer flex flex-col justify-between gap-4 shadow-2xs hover:shadow-md"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="w-10 h-10 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <Plus className="w-5 h-5" />
+                    </div>
+                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-zinc-900 text-white">
+                      새로 만들기
+                    </span>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm sm:text-base font-black text-zinc-950 group-hover:text-zinc-700 transition-colors">
+                      {activeCategory === 'resume' ? '새 이력서' : '새 경력기술서'}
+                    </h4>
+                    <p className="text-xs text-zinc-500 leading-relaxed mt-1">
+                      {activeCategory === 'resume'
+                        ? '빈 백지 템플릿으로 시작하여 자유롭게 기재합니다.'
+                        : '프로젝트 단위의 빈 백지 템플릿으로 시작합니다.'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-zinc-100 flex items-center justify-between">
+                  <span className="text-[11px] font-extrabold text-zinc-900">
+                    빈 문서 열기
+                  </span>
+                  <div className="w-7 h-7 rounded-lg bg-zinc-900 text-white flex items-center justify-center transition-all">
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                {currentCards.map((card, idx) => (
-                  <div
-                    key={card.id}
-                    onClick={() => handleSelectSample(card.id)}
-                    className="group p-4 sm:p-5 rounded-2xl bg-white border border-zinc-200/90 hover:border-zinc-950 transition-all cursor-pointer flex flex-col justify-between gap-4 shadow-2xs hover:shadow-md"
-                  >
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2.5">
-                          <div
-                            className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${card.bg}`}
-                          >
-                            {card.icon}
-                          </div>
-                          <div>
-                            <span className="text-[10px] font-bold text-zinc-400">
-                              직군 #{idx + 1}
-                            </span>
-                            <h4 className="text-sm font-extrabold text-zinc-950 group-hover:text-blue-600 transition-colors">
-                              {card.role}
-                            </h4>
-                          </div>
+              {/* 직군별 대표 5개 샘플 카드 */}
+              {currentCards.map((card, idx) => (
+                <div
+                  key={card.id}
+                  onClick={() => handleSelectSample(card.id)}
+                  className="group p-4 sm:p-5 rounded-2xl bg-white border border-zinc-200/90 hover:border-zinc-950 transition-all cursor-pointer flex flex-col justify-between gap-4 shadow-2xs hover:shadow-md"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2.5">
+                        <div
+                          className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${card.bg}`}
+                        >
+                          {card.icon}
                         </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 border border-zinc-200/60">
-                          {card.badge}
-                        </span>
-                      </div>
-
-                      <p className="text-xs text-zinc-600 leading-relaxed line-clamp-2">
-                        {card.summary}
-                      </p>
-
-                      <div className="flex flex-wrap gap-1">
-                        {card.tags.map((t) => (
-                          <span
-                            key={t}
-                            className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-600"
-                          >
-                            #{t}
+                        <div>
+                          <span className="text-[10px] font-bold text-zinc-400">
+                            샘플 #{idx + 1}
                           </span>
-                        ))}
+                          <h4 className="text-sm font-extrabold text-zinc-950 group-hover:text-blue-600 transition-colors">
+                            {card.role}
+                          </h4>
+                        </div>
                       </div>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 border border-zinc-200/60">
+                        {card.badge}
+                      </span>
                     </div>
 
-                    <div className="pt-3 border-t border-zinc-100 flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-zinc-400 group-hover:text-zinc-700 transition-colors">
-                        이 샘플로 시작하기
-                      </span>
-                      <div className="w-7 h-7 rounded-lg bg-zinc-100 group-hover:bg-zinc-950 text-zinc-700 group-hover:text-white flex items-center justify-center transition-all">
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </div>
+                    <p className="text-xs text-zinc-600 leading-relaxed line-clamp-2">
+                      {card.summary}
+                    </p>
+
+                    <div className="flex flex-wrap gap-1">
+                      {card.tags.map((t) => (
+                        <span
+                          key={t}
+                          className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-600"
+                        >
+                          #{t}
+                        </span>
+                      ))}
                     </div>
                   </div>
-                ))}
-              </div>
+
+                  <div className="pt-3 border-t border-zinc-100 flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-zinc-400 group-hover:text-zinc-700 transition-colors">
+                      이 샘플로 시작하기
+                    </span>
+                    <div className="w-7 h-7 rounded-lg bg-zinc-100 group-hover:bg-zinc-950 text-zinc-700 group-hover:text-white flex items-center justify-center transition-all">
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          )}
+          </div>
         </div>
 
         {/* 내 보관함 최근 문서 목록 */}

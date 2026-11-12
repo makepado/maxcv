@@ -263,7 +263,7 @@ export function App() {
     <div className="min-h-dvh w-full max-w-[100vw] overflow-x-hidden flex flex-col bg-[#fafafa] text-zinc-900">
       {/* 상단 글로벌 네비게이션 바 (인쇄 시 숨김) */}
       <header className="no-print sticky top-0 z-30 h-14 bg-white/95 backdrop-blur border-b border-zinc-200/90 px-3 sm:px-4 flex items-center justify-between gap-2">
-        {/* 좌측: 홈 버튼 + 로고 + 현재 문서 제목 */}
+        {/* 좌측: 홈 버튼 및 (에디터 모드일 때) 현재 문서 제목 + 새 문서/보관함 */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 flex-1">
           {/* 홈화면(대시보드)으로 이동하는 홈 버튼 */}
           <button
@@ -277,136 +277,114 @@ export function App() {
                 ? 'bg-zinc-900 text-white shadow-2xs'
                 : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700'
             }`}
-            title="홈 화면 (이력서/경력기술서 샘플 및 보관함 대시보드)"
+            title="홈 화면 (이력서/경력기술서 대시보드)"
           >
             <Home className="w-4 h-4" />
           </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              setCurrentView('editor');
-              setActiveTab('content');
-              setMobileView('editor');
-              setShowMobileMenu(false);
-            }}
-            className="flex items-center gap-2 shrink-0 group text-left cursor-pointer"
-            title="에디터로 이동"
-          >
-            <div className="w-8 h-8 rounded-lg bg-zinc-950 group-hover:bg-zinc-800 text-white font-black text-sm flex items-center justify-center transition-colors">
-              M
-            </div>
-            <div className="hidden sm:flex items-center gap-1.5">
-              <span className="font-extrabold text-base tracking-tight text-zinc-950 group-hover:text-zinc-700 transition-colors">
-                MaxCV
-              </span>
-              <span className="hidden md:inline-block text-[10px] font-semibold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200">
-                Studio
-              </span>
-            </div>
-          </button>
-
-          <div className="h-4 w-[1px] bg-zinc-200 hidden sm:block shrink-0" />
-
-          {/* 현재 문서 제목 인라인 수정 & 데스크톱 새 문서 / 보관함 버튼 */}
-          <div className="flex items-center gap-1.5 min-w-0 flex-1">
-            <span
-              className={`hidden md:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0 ${
-                activeDoc.docType === 'career'
-                  ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
-                  : 'bg-zinc-100 text-zinc-700 border border-zinc-200'
-              }`}
-            >
-              {activeDoc.docType === 'career' ? '경력기술서' : '이력서'}
-            </span>
-            <input
-              type="text"
-              value={activeDoc.name}
-              onChange={(e) => renameDocument(activeDoc.id, e.target.value)}
-              className="text-xs sm:text-sm font-bold text-zinc-900 bg-zinc-100/80 hover:bg-zinc-100 focus:bg-white px-2.5 py-1.5 rounded-lg border border-transparent focus:border-zinc-900 outline-none truncate w-0 flex-1 max-w-[170px] sm:max-w-[210px]"
-              title="클릭하여 문서 제목 변경"
-            />
-            <button
-              type="button"
-              onClick={() => {
-                setCreateModalType(activeDoc.docType === 'career' ? 'career' : 'resume');
-                setShowCreateModal(true);
-              }}
-              className="hidden lg:flex px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold items-center gap-1 shrink-0 cursor-pointer shadow-2xs"
-              title="새 문서 (샘플 5종 / 빈 문서)"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>새 문서</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowDocDrawer(!showDocDrawer)}
-              className="hidden lg:flex px-2.5 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-xs font-semibold text-zinc-700 items-center gap-1 shrink-0 cursor-pointer"
-              title="문서 보관함 열기"
-            >
-              <FolderOpen className="w-3.5 h-3.5 text-zinc-700" />
-              <span>보관함 ({documents.length})</span>
-            </button>
-          </div>
-        </div>
-
-        {/* 중앙 메인 탭 전환 (데스크톱 xl 이상) & 실행취소/다시실행 스택 버튼 */}
-        <div className="hidden lg:flex items-center gap-2">
-          {/* 실행취소 / 다시실행 스택 뒤로가기 버튼 */}
-          <div className="flex items-center bg-zinc-100 p-0.5 rounded-xl border border-zinc-200/80">
-            <button
-              type="button"
-              onClick={undo}
-              disabled={!canUndo}
-              className={`p-1.5 rounded-lg transition-all ${
-                canUndo
-                  ? 'text-zinc-800 hover:bg-white hover:shadow-2xs cursor-pointer'
-                  : 'text-zinc-300 cursor-not-allowed'
-              }`}
-              title="실행 취소"
-            >
-              <Undo2 className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={redo}
-              disabled={!canRedo}
-              className={`p-1.5 rounded-lg transition-all ${
-                canRedo
-                  ? 'text-zinc-800 hover:bg-white hover:shadow-2xs cursor-pointer'
-                  : 'text-zinc-300 cursor-not-allowed'
-              }`}
-              title="다시 실행"
-            >
-              <Redo2 className="w-4 h-4" />
-            </button>
-          </div>
-
-          <nav className="hidden xl:flex items-center bg-zinc-100 p-1 rounded-xl border border-zinc-200/80">
-            {[
-              { id: 'content', label: '콘텐츠', icon: <FileText className="w-3.5 h-3.5" /> },
-              { id: 'fonts', label: '한국어 폰트', icon: <Type className="w-3.5 h-3.5" /> },
-              { id: 'customize', label: '디자인', icon: <Sliders className="w-3.5 h-3.5" /> },
-              { id: 'export', label: '저장', icon: <Download className="w-3.5 h-3.5" /> },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-white text-zinc-950 shadow-2xs'
-                    : 'text-zinc-500 hover:text-zinc-900'
+          {/* 에디터 모드일 때만 표시되는 문서 제목 및 새문서/보관함 바로가기 */}
+          {currentView === 'editor' && (
+            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+              <span
+                className={`hidden md:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0 ${
+                  activeDoc.docType === 'career'
+                    ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                    : 'bg-zinc-100 text-zinc-700 border border-zinc-200'
                 }`}
               >
-                {tab.icon}
-                <span>{tab.label}</span>
+                {activeDoc.docType === 'career' ? '경력기술서' : '이력서'}
+              </span>
+              <input
+                type="text"
+                value={activeDoc.name}
+                onChange={(e) => renameDocument(activeDoc.id, e.target.value)}
+                className="text-xs sm:text-sm font-bold text-zinc-900 bg-zinc-100/80 hover:bg-zinc-100 focus:bg-white px-2.5 py-1.5 rounded-lg border border-transparent focus:border-zinc-900 outline-none truncate w-0 flex-1 max-w-[170px] sm:max-w-[210px]"
+                title="클릭하여 문서 제목 변경"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setCreateModalType(activeDoc.docType === 'career' ? 'career' : 'resume');
+                  setShowCreateModal(true);
+                }}
+                className="hidden lg:flex px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold items-center gap-1 shrink-0 cursor-pointer shadow-2xs"
+                title="새 문서 (샘플 5종 / 빈 문서)"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>새 문서</span>
               </button>
-            ))}
-          </nav>
+              <button
+                type="button"
+                onClick={() => setShowDocDrawer(!showDocDrawer)}
+                className="hidden lg:flex px-2.5 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-xs font-semibold text-zinc-700 items-center gap-1 shrink-0 cursor-pointer"
+                title="문서 보관함 열기"
+              >
+                <FolderOpen className="w-3.5 h-3.5 text-zinc-700" />
+                <span>보관함 ({documents.length})</span>
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* 우측 (데스크톱 lg 이상): 계정 + 클라우드 저장 + 인쇄 + 로그아웃 */}
+        {/* 중앙 메인 탭 전환 (데스크톱 xl 이상) & 실행취소/다시실행 스택 버튼 - 에디터 모드일 때만 표시 */}
+        {currentView === 'editor' && (
+          <div className="hidden lg:flex items-center gap-2">
+            {/* 실행취소 / 다시실행 스택 뒤로가기 버튼 */}
+            <div className="flex items-center bg-zinc-100 p-0.5 rounded-xl border border-zinc-200/80">
+              <button
+                type="button"
+                onClick={undo}
+                disabled={!canUndo}
+                className={`p-1.5 rounded-lg transition-all ${
+                  canUndo
+                    ? 'text-zinc-800 hover:bg-white hover:shadow-2xs cursor-pointer'
+                    : 'text-zinc-300 cursor-not-allowed'
+                }`}
+                title="실행 취소"
+              >
+                <Undo2 className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={redo}
+                disabled={!canRedo}
+                className={`p-1.5 rounded-lg transition-all ${
+                  canRedo
+                    ? 'text-zinc-800 hover:bg-white hover:shadow-2xs cursor-pointer'
+                    : 'text-zinc-300 cursor-not-allowed'
+                }`}
+                title="다시 실행"
+              >
+                <Redo2 className="w-4 h-4" />
+              </button>
+            </div>
+
+            <nav className="hidden xl:flex items-center bg-zinc-100 p-1 rounded-xl border border-zinc-200/80">
+              {[
+                { id: 'content', label: '콘텐츠', icon: <FileText className="w-3.5 h-3.5" /> },
+                { id: 'fonts', label: '한국어 폰트', icon: <Type className="w-3.5 h-3.5" /> },
+                { id: 'customize', label: '디자인', icon: <Sliders className="w-3.5 h-3.5" /> },
+                { id: 'export', label: '저장', icon: <Download className="w-3.5 h-3.5" /> },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
+                    activeTab === tab.id
+                      ? 'bg-white text-zinc-950 shadow-2xs'
+                      : 'text-zinc-500 hover:text-zinc-900'
+                  }`}
+                >
+                  {tab.icon}
+                  <span>{tab.label}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+        )}
+
+        {/* 우측 (데스크톱 lg 이상): 계정 + (에디터 모드일 때만 클라우드 저장 / PDF 인쇄) + 로그아웃 */}
         <div className="hidden lg:flex items-center gap-2 shrink-0">
           <button
             type="button"
@@ -435,33 +413,38 @@ export function App() {
             <span className="truncate max-w-[120px]">{currentUser.name}</span>
           </button>
 
-          <button
-            type="button"
-            onClick={handleQuickSaveD1}
-            className="px-3 py-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 flex items-center gap-1.5 transition-all"
-            title={`${currentUser.email} 계정 클라우드에 현재 상태를 저장합니다`}
-          >
-            {quickSaved ? (
-              <>
-                <Check className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="text-emerald-700">저장됨</span>
-              </>
-            ) : (
-              <>
-                <CloudUpload className="w-3.5 h-3.5 text-zinc-700" />
-                <span>클라우드 저장</span>
-              </>
-            )}
-          </button>
+          {/* 클라우드 저장 및 PDF 인쇄는 에디터 화면에서만 표시 */}
+          {currentView === 'editor' && (
+            <>
+              <button
+                type="button"
+                onClick={handleQuickSaveD1}
+                className="px-3 py-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 flex items-center gap-1.5 transition-all"
+                title={`${currentUser.email} 계정 클라우드에 현재 상태를 저장합니다`}
+              >
+                {quickSaved ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="text-emerald-700">저장됨</span>
+                  </>
+                ) : (
+                  <>
+                    <CloudUpload className="w-3.5 h-3.5 text-zinc-700" />
+                    <span>클라우드 저장</span>
+                  </>
+                )}
+              </button>
 
-          <button
-            type="button"
-            onClick={() => printVectorPdfClean(activeDoc)}
-            className="p-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold flex items-center justify-center transition-all shadow-xs"
-            title="인쇄 / PDF로 저장하기"
-          >
-            <Printer className="w-4 h-4" />
-          </button>
+              <button
+                type="button"
+                onClick={() => printVectorPdfClean(activeDoc)}
+                className="p-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold flex items-center justify-center transition-all shadow-xs"
+                title="인쇄 / PDF로 저장하기"
+              >
+                <Printer className="w-4 h-4" />
+              </button>
+            </>
+          )}
 
           <button
             type="button"
@@ -473,55 +456,59 @@ export function App() {
           </button>
         </div>
 
-        {/* 우측 (모바일/태블릿 lg 미만): 실행취소/뒤로가기 아이콘 + 미리보기 전환 버튼 + 햄버거 메뉴 버튼 */}
+        {/* 우측 (모바일/태블릿 lg 미만): 에디터일 때 [실행취소/뒤로가기 아이콘 + 미리보기 전환 버튼] + 햄버거 메뉴 버튼 */}
         <div className="flex lg:hidden items-center gap-1.5 shrink-0">
-          <div className="flex items-center bg-zinc-100 p-0.5 rounded-lg border border-zinc-200/80">
-            <button
-              type="button"
-              onClick={undo}
-              disabled={!canUndo}
-              className={`p-1.5 rounded-md transition-all ${
-                canUndo ? 'text-zinc-800 hover:bg-white cursor-pointer' : 'text-zinc-300 cursor-not-allowed'
-              }`}
-              title="실행 취소 / 뒤로가기"
-              aria-label="실행 취소"
-            >
-              <Undo2 className="w-3.5 h-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={redo}
-              disabled={!canRedo}
-              className={`p-1.5 rounded-md transition-all ${
-                canRedo ? 'text-zinc-800 hover:bg-white cursor-pointer' : 'text-zinc-300 cursor-not-allowed'
-              }`}
-              title="다시 실행"
-              aria-label="다시 실행"
-            >
-              <Redo2 className="w-3.5 h-3.5" />
-            </button>
-          </div>
+          {currentView === 'editor' && (
+            <>
+              <div className="flex items-center bg-zinc-100 p-0.5 rounded-lg border border-zinc-200/80">
+                <button
+                  type="button"
+                  onClick={undo}
+                  disabled={!canUndo}
+                  className={`p-1.5 rounded-md transition-all ${
+                    canUndo ? 'text-zinc-800 hover:bg-white cursor-pointer' : 'text-zinc-300 cursor-not-allowed'
+                  }`}
+                  title="실행 취소 / 뒤로가기"
+                  aria-label="실행 취소"
+                >
+                  <Undo2 className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={redo}
+                  disabled={!canRedo}
+                  className={`p-1.5 rounded-md transition-all ${
+                    canRedo ? 'text-zinc-800 hover:bg-white cursor-pointer' : 'text-zinc-300 cursor-not-allowed'
+                  }`}
+                  title="다시 실행"
+                  aria-label="다시 실행"
+                >
+                  <Redo2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              setMobileView(mobileView === 'editor' ? 'preview' : 'editor');
-              setShowMobileMenu(false);
-            }}
-            className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-950 text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs"
-          >
-            {mobileView === 'editor' ? (
-              <>
-                <Eye className="w-3.5 h-3.5" />
-                <span className="hidden xs:inline">미리보기</span>
-              </>
-            ) : (
-              <>
-                <PenLine className="w-3.5 h-3.5" />
-                <span className="hidden xs:inline">편집하기</span>
-              </>
-            )}
-          </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileView(mobileView === 'editor' ? 'preview' : 'editor');
+                  setShowMobileMenu(false);
+                }}
+                className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-950 text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs"
+              >
+                {mobileView === 'editor' ? (
+                  <>
+                    <Eye className="w-3.5 h-3.5" />
+                    <span className="hidden xs:inline">미리보기</span>
+                  </>
+                ) : (
+                  <>
+                    <PenLine className="w-3.5 h-3.5" />
+                    <span className="hidden xs:inline">편집하기</span>
+                  </>
+                )}
+              </button>
+            </>
+          )}
 
           <button
             type="button"
@@ -669,12 +656,13 @@ export function App() {
         </div>
       )}
 
-      {/* 모바일/태블릿용 에디터 4분할 탭 바 (미리보기 모드일 때는 숨겨서 화면을 미니멀하게 유지) */}
-      <div
-        className={`no-print xl:hidden bg-white border-b border-zinc-200 px-3 py-1.5 ${
-          mobileView === 'preview' ? 'hidden lg:block' : 'block'
-        }`}
-      >
+      {/* 모바일/태블릿용 에디터 4분할 탭 바 (에디터 모드에서만 표시, 미리보기 모드일 때는 숨김) */}
+      {currentView === 'editor' && (
+        <div
+          className={`no-print xl:hidden bg-white border-b border-zinc-200 px-3 py-1.5 ${
+            mobileView === 'preview' ? 'hidden lg:block' : 'block'
+          }`}
+        >
         <div className="grid grid-cols-4 gap-1 max-w-2xl mx-auto">
           {[
             { id: 'content', label: '콘텐츠', icon: <FileText className="w-3.5 h-3.5" /> },
@@ -704,6 +692,7 @@ export function App() {
           })}
         </div>
       </div>
+      )}
 
       {/* Google 로그인 모달 */}
       <GoogleAuthModal

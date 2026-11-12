@@ -179,15 +179,12 @@ export const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
           </button>
         </div>
 
-        {/* 탭 1: 이력서 vs 경력기술서 대분류 */}
+        {/* 탭 1: 이력서 vs 경력기술서 대분류 (괄호 제거 및 간결한 구성) */}
         <div className="p-3 sm:px-6 sm:pt-4 sm:pb-3 bg-zinc-50/70 border-b border-zinc-200/70 shrink-0">
           <div className="grid grid-cols-2 gap-2 bg-zinc-200/70 p-1 rounded-xl sm:rounded-2xl">
             <button
               type="button"
-              onClick={() => {
-                setDocType('resume');
-                setMode('sample');
-              }}
+              onClick={() => setDocType('resume')}
               className={`py-2 sm:py-2.5 px-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                 docType === 'resume'
                   ? 'bg-white text-zinc-950 shadow-xs'
@@ -195,14 +192,11 @@ export const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
               }`}
             >
               <FileText className="w-4 h-4" />
-              <span>이력서 (CV / Resume)</span>
+              <span>이력서</span>
             </button>
             <button
               type="button"
-              onClick={() => {
-                setDocType('career');
-                setMode('sample');
-              }}
+              onClick={() => setDocType('career')}
               className={`py-2 sm:py-2.5 px-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                 docType === 'career'
                   ? 'bg-white text-indigo-950 shadow-xs'
@@ -210,128 +204,101 @@ export const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
               }`}
             >
               <Briefcase className="w-4 h-4 text-indigo-600" />
-              <span>경력기술서 (Projects)</span>
+              <span>경력기술서</span>
             </button>
-          </div>
-
-          {/* 소분류: 빈 문서 vs 직군별 샘플 선택 바 */}
-          <div className="mt-3 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => setMode('sample')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  mode === 'sample'
-                    ? 'bg-zinc-900 text-white'
-                    : 'bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-100'
-                }`}
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>대표 직군 샘플 (5종)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setMode('blank')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  mode === 'blank'
-                    ? 'bg-zinc-900 text-white'
-                    : 'bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-100'
-                }`}
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>{docType === 'resume' ? '빈 이력서' : '빈 경력기술서'}</span>
-              </button>
-            </div>
-            <span className="text-[11px] text-zinc-400 hidden sm:inline">
-              {docType === 'resume' ? '요약 중심 표준 포맷' : '프로젝트 문제·해결·성과 상세 포맷'}
-            </span>
           </div>
         </div>
 
-        {/* 본문 콘텐츠 스크롤 영역 */}
+        {/* 본문 콘텐츠 스크롤 영역: 새 빈 문서 시작 카드 + 대표 5종 샘플 리스트 */}
         <div className="p-3 sm:p-6 overflow-y-auto flex-1 min-h-0 space-y-3">
-          {mode === 'blank' ? (
-            <div className="p-6 sm:p-8 rounded-2xl border-2 border-dashed border-zinc-300 hover:border-zinc-900 bg-zinc-50/50 hover:bg-zinc-50 transition-all text-center flex flex-col items-center justify-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-white border border-zinc-200 shadow-xs flex items-center justify-center">
-                {docType === 'resume' ? (
-                  <FileText className="w-6 h-6 text-zinc-800" />
-                ) : (
-                  <Briefcase className="w-6 h-6 text-indigo-700" />
-                )}
+          <div className="space-y-2.5">
+            {/* 첫 번째 카드: 새 빈 문서 시작 */}
+            <div
+              onClick={handleSelectBlank}
+              className="group p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border-2 border-dashed border-zinc-300 hover:border-zinc-950 bg-zinc-50/50 hover:bg-zinc-50 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs hover:shadow-xs"
+            >
+              <div className="flex items-start gap-3 min-w-0 flex-1">
+                <div className="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <Plus className="w-4 h-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-zinc-900 text-white">
+                      새로 만들기
+                    </span>
+                    <h4 className="text-sm font-extrabold text-zinc-900 group-hover:text-zinc-950 truncate">
+                      {docType === 'resume' ? '새 이력서 (빈 문서)' : '새 경력기술서 (빈 문서)'}
+                    </h4>
+                  </div>
+                  <p className="text-xs text-zinc-500 mt-1 line-clamp-1 leading-relaxed">
+                    {docType === 'resume'
+                      ? '기본 틀만 갖춘 깔끔한 백지 상태에서 바로 작성을 시작합니다.'
+                      : '프로젝트 단위 가이드 항목이 포함된 백지 상태로 바로 시작합니다.'}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-base font-extrabold text-zinc-950">
-                  {docType === 'resume' ? '빈 이력서로 시작하기' : '빈 경력기술서로 시작하기'}
-                </h3>
-                <p className="text-xs text-zinc-500 mt-1 max-w-sm mx-auto leading-relaxed">
-                  {docType === 'resume'
-                    ? '기본 인적사항, 학력, 경력, 보유 기술 틀만 갖춘 깔끔한 백지 상태에서 자유롭게 작성합니다.'
-                    : '경력 요약 및 프로젝트별 문제·해결·정량 성과 가이드 항목이 포함된 백지 상태로 시작합니다.'}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={handleSelectBlank}
-                className="mt-2 px-5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold flex items-center gap-2 cursor-pointer shadow-sm transition-all"
-              >
-                <span>빈 문서 생성하기</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-2.5">
-              <div className="text-[11px] font-bold text-zinc-400 px-1">
-                대표 5개 직군별 검증된 템플릿 중 하나를 선택하세요:
-              </div>
-              <div className="grid grid-cols-1 gap-2.5">
-                {currentMetas.map((meta, idx) => (
-                  <div
-                    key={meta.id}
-                    onClick={() => handleSelectSample(meta.id)}
-                    className="group p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-zinc-200/90 hover:border-zinc-950 bg-white hover:bg-zinc-50/60 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs hover:shadow-xs"
-                  >
-                    <div className="flex items-start gap-3 min-w-0 flex-1">
-                      <div
-                        className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${meta.bg}`}
-                      >
-                        {meta.icon}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200/70">
-                            {idx + 1}. {meta.badge}
-                          </span>
-                          <h4 className="text-sm font-extrabold text-zinc-900 group-hover:text-zinc-950 truncate">
-                            {meta.role}
-                          </h4>
-                        </div>
-                        <p className="text-xs text-zinc-500 mt-1 line-clamp-1 leading-relaxed">
-                          {meta.summary}
-                        </p>
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          {meta.tags.map((t) => (
-                            <span
-                              key={t}
-                              className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600"
-                            >
-                              #{t}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
 
-                    <div className="flex items-center justify-end sm:justify-center shrink-0">
-                      <span className="px-3 py-1.5 rounded-lg bg-zinc-100 group-hover:bg-zinc-950 text-zinc-700 group-hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all">
-                        <span>선택하기</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </span>
+              <div className="flex items-center justify-end sm:justify-center shrink-0">
+                <span className="px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs font-bold flex items-center gap-1.5 transition-all">
+                  <span>빈 문서 열기</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </span>
+              </div>
+            </div>
+
+            <div className="text-[11px] font-bold text-zinc-400 px-1 pt-2">
+              또는 대표 5개 직군별 추천 샘플로 시작:
+            </div>
+
+            {/* 대표 5개 샘플 카드 */}
+            <div className="grid grid-cols-1 gap-2.5">
+              {currentMetas.map((meta, idx) => (
+                <div
+                  key={meta.id}
+                  onClick={() => handleSelectSample(meta.id)}
+                  className="group p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-zinc-200/90 hover:border-zinc-950 bg-white hover:bg-zinc-50/60 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs hover:shadow-xs"
+                >
+                  <div className="flex items-start gap-3 min-w-0 flex-1">
+                    <div
+                      className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${meta.bg}`}
+                    >
+                      {meta.icon}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200/70">
+                          샘플 #{idx + 1}
+                        </span>
+                        <h4 className="text-sm font-extrabold text-zinc-900 group-hover:text-zinc-950 truncate">
+                          {meta.role}
+                        </h4>
+                      </div>
+                      <p className="text-xs text-zinc-500 mt-1 line-clamp-1 leading-relaxed">
+                        {meta.summary}
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {meta.tags.map((t) => (
+                          <span
+                            key={t}
+                            className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600"
+                          >
+                            #{t}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
+
+                  <div className="flex items-center justify-end sm:justify-center shrink-0">
+                    <span className="px-3 py-1.5 rounded-lg bg-zinc-100 group-hover:bg-zinc-950 text-zinc-700 group-hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all">
+                      <span>선택하기</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-          )}
+          </div>
         </div>
 
         {/* 하단 푸터 */}
