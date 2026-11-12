@@ -22,6 +22,8 @@ import {
   X,
   Home,
   Briefcase,
+  Undo2,
+  Redo2,
 } from 'lucide-react';
 import { useCVStore } from './store/useCVStore';
 import { ContentEditorPanel } from './components/ContentEditorPanel';
@@ -44,6 +46,10 @@ export function App() {
   const activeDocId = useCVStore((s) => s.activeDocId);
   const activeTab = useCVStore((s) => s.activeTab);
   const previewZoom = useCVStore((s) => s.previewZoom);
+  const canUndo = useCVStore((s) => s.canUndo);
+  const canRedo = useCVStore((s) => s.canRedo);
+  const undo = useCVStore((s) => s.undo);
+  const redo = useCVStore((s) => s.redo);
 
   const setCurrentUser = useCVStore((s) => s.setCurrentUser);
   const setActiveTab = useCVStore((s) => s.setActiveTab);
@@ -90,6 +96,45 @@ export function App() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // 키보드 단축키 (Ctrl+Z / Cmd+Z = 뒤로가기, Ctrl+Y / Cmd+Shift+Z = 다시실행)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+      const isCmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
+      if (!isCmdOrCtrl) return;
+
+      const target = e.target as HTMLElement | null;
+      // 인풋 텍스트 필드 안에서 입력 중인 기본 브라우저 실행은 방해하지 않음
+      const isInput =
+        target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
+
+      if (e.key.toLowerCase() === 'z') {
+        if (e.shiftKey) {
+          // Redo
+          if (!isInput && canRedo) {
+            e.preventDefault();
+            redo();
+          }
+        } else {
+          // Undo
+          if (!isInput && canUndo) {
+            e.preventDefault();
+            undo();
+          }
+        }
+      } else if (e.key.toLowerCase() === 'y') {
+        // Redo on Windows
+        if (!isInput && canRedo) {
+          e.preventDefault();
+          redo();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [canUndo, canRedo, undo, redo]);
 
   // 모바일 화면 크기 변경 시 수동 줌 초기화하여 화면 맞춤 유지
   useEffect(() => {
@@ -344,29 +389,61 @@ export function App() {
           </div>
         </div>
 
-        {/* 중앙 메인 탭 전환 (데스크톱 xl 이상) */}
-        <nav className="hidden xl:flex items-center bg-zinc-100 p-1 rounded-xl border border-zinc-200/80">
-          {[
-            { id: 'content', label: '콘텐츠', icon: <FileText className="w-3.5 h-3.5" /> },
-            { id: 'fonts', label: '한국어 폰트', icon: <Type className="w-3.5 h-3.5" /> },
-            { id: 'customize', label: '디자인', icon: <Sliders className="w-3.5 h-3.5" /> },
-            { id: 'export', label: '저장', icon: <Download className="w-3.5 h-3.5" /> },
-          ].map((tab) => (
+        {/* 중앙 메인 탭 전환 (데스크톱 xl 이상) & 실행취소/다시실행 스택 버튼 */}
+        <div className="hidden lg:flex items-center gap-2">
+          {/* 실행취소 / 다시실행 스택 뒤로가기 버튼 */}
+          <div className="flex items-center bg-zinc-100 p-0.5 rounded-xl border border-zinc-200/80">
             <button
-              key={tab.id}
               type="button"
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
-                activeTab === tab.id
-                  ? 'bg-white text-zinc-950 shadow-2xs'
-                  : 'text-zinc-500 hover:text-zinc-900'
+              onClick={undo}
+              disabled={!canUndo}
+              className={`p-1.5 rounded-lg transition-all ${
+                canUndo
+                  ? 'text-zinc-800 hover:bg-white hover:shadow-2xs cursor-pointer'
+                  : 'text-zinc-300 cursor-not-allowed'
               }`}
+              title="실행 취소 / 뒤로가기 (Ctrl+Z / ⌘Z)"
             >
-              {tab.icon}
-              <span>{tab.label}</span>
+              <Undo2 className="w-4 h-4" />
             </button>
-          ))}
-        </nav>
+            <button
+              type="button"
+              onClick={redo}
+              disabled={!canRedo}
+              className={`p-1.5 rounded-lg transition-all ${
+                canRedo
+                  ? 'text-zinc-800 hover:bg-white hover:shadow-2xs cursor-pointer'
+                  : 'text-zinc-300 cursor-not-allowed'
+              }`}
+              title="다시 실행 (Ctrl+Y / ⌘⇧Z)"
+            >
+              <Redo2 className="w-4 h-4" />
+            </button>
+          </div>
+
+          <nav className="hidden xl:flex items-center bg-zinc-100 p-1 rounded-xl border border-zinc-200/80">
+            {[
+              { id: 'content', label: '콘텐츠', icon: <FileText className="w-3.5 h-3.5" /> },
+              { id: 'fonts', label: '한국어 폰트', icon: <Type className="w-3.5 h-3.5" /> },
+              { id: 'customize', label: '디자인', icon: <Sliders className="w-3.5 h-3.5" /> },
+              { id: 'export', label: '저장', icon: <Download className="w-3.5 h-3.5" /> },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-white text-zinc-950 shadow-2xs'
+                    : 'text-zinc-500 hover:text-zinc-900'
+                }`}
+              >
+                {tab.icon}
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </nav>
+        </div>
 
         {/* 우측 (데스크톱 lg 이상): 계정 + 클라우드 저장 + 인쇄 + 로그아웃 */}
         <div className="hidden lg:flex items-center gap-2 shrink-0">
@@ -435,25 +512,52 @@ export function App() {
           </button>
         </div>
 
-        {/* 우측 (모바일/태블릿 lg 미만): 미리보기 전환 버튼 + 햄버거 메뉴 버튼 */}
+        {/* 우측 (모바일/태블릿 lg 미만): 실행취소/뒤로가기 아이콘 + 미리보기 전환 버튼 + 햄버거 메뉴 버튼 */}
         <div className="flex lg:hidden items-center gap-1.5 shrink-0">
+          <div className="flex items-center bg-zinc-100 p-0.5 rounded-lg border border-zinc-200/80">
+            <button
+              type="button"
+              onClick={undo}
+              disabled={!canUndo}
+              className={`p-1.5 rounded-md transition-all ${
+                canUndo ? 'text-zinc-800 hover:bg-white cursor-pointer' : 'text-zinc-300 cursor-not-allowed'
+              }`}
+              title="실행 취소 / 뒤로가기"
+              aria-label="실행 취소"
+            >
+              <Undo2 className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={redo}
+              disabled={!canRedo}
+              className={`p-1.5 rounded-md transition-all ${
+                canRedo ? 'text-zinc-800 hover:bg-white cursor-pointer' : 'text-zinc-300 cursor-not-allowed'
+              }`}
+              title="다시 실행"
+              aria-label="다시 실행"
+            >
+              <Redo2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
           <button
             type="button"
             onClick={() => {
               setMobileView(mobileView === 'editor' ? 'preview' : 'editor');
               setShowMobileMenu(false);
             }}
-            className="px-3 py-1.5 rounded-lg bg-zinc-950 text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs"
+            className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-950 text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs"
           >
             {mobileView === 'editor' ? (
               <>
                 <Eye className="w-3.5 h-3.5" />
-                <span>미리보기</span>
+                <span className="hidden xs:inline">미리보기</span>
               </>
             ) : (
               <>
                 <PenLine className="w-3.5 h-3.5" />
-                <span>편집하기</span>
+                <span className="hidden xs:inline">편집하기</span>
               </>
             )}
           </button>

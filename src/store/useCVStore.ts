@@ -19,6 +19,12 @@ interface CVStoreState {
   activeTab: 'content' | 'customize' | 'fonts' | 'templates' | 'export';
   previewZoom: number;
 
+  // History Undo / Redo
+  canUndo: boolean;
+  canRedo: boolean;
+  undo: () => void;
+  redo: () => void;
+
   // Auth & User Actions
   setCurrentUser: (user: GoogleUserProfile | null) => void;
   setGoogleClientId: (clientId: string) => void;
@@ -57,6 +63,25 @@ interface CVStoreState {
   resetDesign: () => void;
 }
 
+
+// Document edit history stack for Undo / Redo
+const MAX_HISTORY_LENGTH = 30;
+let undoStack: CVDocument[] = [];
+let redoStack: CVDocument[] = [];
+
+function cloneDoc(doc: CVDocument): CVDocument {
+  return JSON.parse(JSON.stringify(doc));
+}
+
+function pushUndoSnapshot(currentDoc: CVDocument) {
+  undoStack.push(cloneDoc(currentDoc));
+  if (undoStack.length > MAX_HISTORY_LENGTH) {
+    undoStack.shift();
+  }
+  // Clear redo stack on new action
+  redoStack = [];
+}
+
 function generateId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
 }
@@ -69,7 +94,35 @@ export const useCVStore = create<CVStoreState>()(
       documents: SAMPLE_CVS,
       activeDocId: SAMPLE_CVS[0].id,
       activeTab: 'content',
-      previewZoom: 0.92,
+            previewZoom: 0.92,
+      canUndo: false,
+      canRedo: false,
+
+      undo: () => {
+        if (undoStack.length === 0) return;
+        const currentActive = get().getActiveDocument();
+        const previousDoc = undoStack.pop();
+        if (!previousDoc) return;
+        redoStack.push(cloneDoc(currentActive));
+        set((state) => ({
+          documents: state.documents.map((d) => (d.id === previousDoc.id ? previousDoc : d)),
+          canUndo: undoStack.length > 0,
+          canRedo: redoStack.length > 0,
+        }));
+      },
+
+      redo: () => {
+        if (redoStack.length === 0) return;
+        const currentActive = get().getActiveDocument();
+        const nextDoc = redoStack.pop();
+        if (!nextDoc) return;
+        undoStack.push(cloneDoc(currentActive));
+        set((state) => ({
+          documents: state.documents.map((d) => (d.id === nextDoc.id ? nextDoc : d)),
+          canUndo: undoStack.length > 0,
+          canRedo: redoStack.length > 0,
+        }));
+      },
 
       setCurrentUser: (user) => set({ currentUser: user }),
       setGoogleClientId: (clientId) => set({ googleClientId: clientId }),
@@ -87,7 +140,11 @@ export const useCVStore = create<CVStoreState>()(
         return documents.find((d) => d.id === activeDocId) || documents[0];
       },
 
-      selectDocument: (docId) => set({ activeDocId: docId }),
+            selectDocument: (docId) => {
+        undoStack = [];
+        redoStack = [];
+        set({ activeDocId: docId, canUndo: false, canRedo: false });
+      },
 
       createNewDocument: (presetDoc, nameOverride) => {
         const newId = generateId('cv');
@@ -230,6 +287,8 @@ export const useCVStore = create<CVStoreState>()(
         }
 
         set((state) => ({
+          canUndo: undoStack.length > 0,
+          canRedo: redoStack.length > 0,
           documents: [baseDoc, ...state.documents],
           activeDocId: newId,
         }));
@@ -256,6 +315,8 @@ export const useCVStore = create<CVStoreState>()(
 
       renameDocument: (docId, name) => {
         set((state) => ({
+          canUndo: undoStack.length > 0,
+          canRedo: redoStack.length > 0,
           documents: state.documents.map((doc) =>
             doc.id === docId ? { ...doc, name, updatedAt: new Date().toISOString() } : doc
           ),
@@ -275,13 +336,19 @@ export const useCVStore = create<CVStoreState>()(
           },
         };
         set((state) => ({
+          canUndo: undoStack.length > 0,
+          canRedo: redoStack.length > 0,
           documents: [sanitized, ...state.documents],
           activeDocId: newId,
         }));
       },
 
       updatePersonal: (patch) => {
+        const active = get().getActiveDocument();
+        if (active) pushUndoSnapshot(active);
         set((state) => ({
+          canUndo: undoStack.length > 0,
+          canRedo: redoStack.length > 0,
           documents: state.documents.map((doc) =>
             doc.id === state.activeDocId
               ? {
@@ -295,6 +362,8 @@ export const useCVStore = create<CVStoreState>()(
       },
 
       addSection: (type, customTitle) => {
+        const active = get().getActiveDocument();
+        if (active) pushUndoSnapshot(active);
         const meta = SECTION_CATALOG.find((s) => s.type === type) || SECTION_CATALOG[0];
         const newSection: CVSection = {
           id: generateId('sec'),
@@ -323,6 +392,8 @@ export const useCVStore = create<CVStoreState>()(
         };
 
         set((state) => ({
+          canUndo: undoStack.length > 0,
+          canRedo: redoStack.length > 0,
           documents: state.documents.map((doc) =>
             doc.id === state.activeDocId
               ? {
@@ -336,7 +407,11 @@ export const useCVStore = create<CVStoreState>()(
       },
 
       updateSection: (sectionId, patch) => {
+        const active = get().getActiveDocument();
+        if (active) pushUndoSnapshot(active);
         set((state) => ({
+          canUndo: undoStack.length > 0,
+          canRedo: redoStack.length > 0,
           documents: state.documents.map((doc) =>
             doc.id === state.activeDocId
               ? {
@@ -352,7 +427,11 @@ export const useCVStore = create<CVStoreState>()(
       },
 
       removeSection: (sectionId) => {
+        const active = get().getActiveDocument();
+        if (active) pushUndoSnapshot(active);
         set((state) => ({
+          canUndo: undoStack.length > 0,
+          canRedo: redoStack.length > 0,
           documents: state.documents.map((doc) =>
             doc.id === state.activeDocId
               ? {
@@ -366,7 +445,11 @@ export const useCVStore = create<CVStoreState>()(
       },
 
       moveSectionOrder: (sectionId, direction) => {
+        const active = get().getActiveDocument();
+        if (active) pushUndoSnapshot(active);
         set((state) => ({
+          canUndo: undoStack.length > 0,
+          canRedo: redoStack.length > 0,
           documents: state.documents.map((doc) => {
             if (doc.id !== state.activeDocId) return doc;
             const idx = doc.sections.findIndex((s) => s.id === sectionId);
@@ -386,7 +469,11 @@ export const useCVStore = create<CVStoreState>()(
       },
 
       toggleSectionColumn: (sectionId) => {
+        const active = get().getActiveDocument();
+        if (active) pushUndoSnapshot(active);
         set((state) => ({
+          canUndo: undoStack.length > 0,
+          canRedo: redoStack.length > 0,
           documents: state.documents.map((doc) =>
             doc.id === state.activeDocId
               ? {
@@ -404,6 +491,8 @@ export const useCVStore = create<CVStoreState>()(
       },
 
       addSectionItem: (sectionId) => {
+        const active = get().getActiveDocument();
+        if (active) pushUndoSnapshot(active);
         const newItem: SectionItem = {
           id: generateId('item'),
           visible: true,
@@ -421,6 +510,8 @@ export const useCVStore = create<CVStoreState>()(
           levelText: '',
         };
         set((state) => ({
+          canUndo: undoStack.length > 0,
+          canRedo: redoStack.length > 0,
           documents: state.documents.map((doc) =>
             doc.id === state.activeDocId
               ? {
@@ -438,7 +529,11 @@ export const useCVStore = create<CVStoreState>()(
       },
 
       updateSectionItem: (sectionId, itemId, patch) => {
+        const active = get().getActiveDocument();
+        if (active) pushUndoSnapshot(active);
         set((state) => ({
+          canUndo: undoStack.length > 0,
+          canRedo: redoStack.length > 0,
           documents: state.documents.map((doc) =>
             doc.id === state.activeDocId
               ? {
@@ -461,7 +556,11 @@ export const useCVStore = create<CVStoreState>()(
       },
 
       removeSectionItem: (sectionId, itemId) => {
+        const active = get().getActiveDocument();
+        if (active) pushUndoSnapshot(active);
         set((state) => ({
+          canUndo: undoStack.length > 0,
+          canRedo: redoStack.length > 0,
           documents: state.documents.map((doc) =>
             doc.id === state.activeDocId
               ? {
@@ -479,7 +578,11 @@ export const useCVStore = create<CVStoreState>()(
       },
 
       duplicateSectionItem: (sectionId, itemId) => {
+        const active = get().getActiveDocument();
+        if (active) pushUndoSnapshot(active);
         set((state) => ({
+          canUndo: undoStack.length > 0,
+          canRedo: redoStack.length > 0,
           documents: state.documents.map((doc) => {
             if (doc.id !== state.activeDocId) return doc;
             return {
@@ -503,7 +606,11 @@ export const useCVStore = create<CVStoreState>()(
       },
 
       moveSectionItemOrder: (sectionId, itemId, direction) => {
+        const active = get().getActiveDocument();
+        if (active) pushUndoSnapshot(active);
         set((state) => ({
+          canUndo: undoStack.length > 0,
+          canRedo: redoStack.length > 0,
           documents: state.documents.map((doc) => {
             if (doc.id !== state.activeDocId) return doc;
             return {
@@ -526,7 +633,11 @@ export const useCVStore = create<CVStoreState>()(
       },
 
       updateDesign: (patch) => {
+        const active = get().getActiveDocument();
+        if (active) pushUndoSnapshot(active);
         set((state) => ({
+          canUndo: undoStack.length > 0,
+          canRedo: redoStack.length > 0,
           documents: state.documents.map((doc) =>
             doc.id === state.activeDocId
               ? {
@@ -540,7 +651,11 @@ export const useCVStore = create<CVStoreState>()(
       },
 
       resetDesign: () => {
+        const active = get().getActiveDocument();
+        if (active) pushUndoSnapshot(active);
         set((state) => ({
+          canUndo: undoStack.length > 0,
+          canRedo: redoStack.length > 0,
           documents: state.documents.map((doc) =>
             doc.id === state.activeDocId
               ? {
