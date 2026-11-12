@@ -20,6 +20,8 @@ import {
   PenLine,
   Menu,
   X,
+  Home,
+  Briefcase,
 } from 'lucide-react';
 import { useCVStore } from './store/useCVStore';
 import { ContentEditorPanel } from './components/ContentEditorPanel';
@@ -29,6 +31,8 @@ import { ExportAndCloudPanel } from './components/ExportAndCloudPanel';
 import { CVPreviewCanvas } from './components/CVPreviewCanvas';
 import { GoogleAuthModal } from './components/GoogleAuthModal';
 import { LandingPage } from './components/LandingPage';
+import { LoggedInHomeDashboard } from './components/LoggedInHomeDashboard';
+import { CreateDocumentModal } from './components/CreateDocumentModal';
 import { SAMPLE_CVS } from './constants/defaultCv';
 import { createBlankCareerDoc, SAMPLE_CAREERS } from './constants/careerSamples';
 import { GoogleUserProfile } from './types/cv';
@@ -59,6 +63,11 @@ export function App() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [quickSaved, setQuickSaved] = useState(false);
   const [mobileView, setMobileView] = useState<'editor' | 'preview'>('editor');
+  // 로그인 후 대시보드 홈 vs 문서 에디터 화면 전환
+  const [currentView, setCurrentView] = useState<'home' | 'editor'>('editor');
+  // 새 문서 선택 모달
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createModalType, setCreateModalType] = useState<'resume' | 'career'>('resume');
 
   // 모바일/태블릿 화면 폭 감지 및 A4 용지 자동 배율(Auto-Fit) 계산
   const [windowWidth, setWindowWidth] = useState<number>(
@@ -248,17 +257,35 @@ export function App() {
     <div className="min-h-dvh w-full max-w-[100vw] overflow-x-hidden flex flex-col bg-[#fafafa] text-zinc-900">
       {/* 상단 글로벌 네비게이션 바 (인쇄 시 숨김) */}
       <header className="no-print sticky top-0 z-30 h-14 bg-white/95 backdrop-blur border-b border-zinc-200/90 px-3 sm:px-4 flex items-center justify-between gap-2">
-        {/* 좌측: 로고 + 현재 문서 제목 */}
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+        {/* 좌측: 홈 버튼 + 로고 + 현재 문서 제목 */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 flex-1">
+          {/* 홈화면(대시보드)으로 이동하는 홈 버튼 */}
           <button
             type="button"
             onClick={() => {
+              setCurrentView('home');
+              setShowMobileMenu(false);
+            }}
+            className={`p-2 rounded-xl flex items-center justify-center transition-all cursor-pointer shrink-0 ${
+              currentView === 'home'
+                ? 'bg-zinc-900 text-white shadow-2xs'
+                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700'
+            }`}
+            title="홈 화면 (이력서/경력기술서 샘플 및 보관함 대시보드)"
+          >
+            <Home className="w-4 h-4" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setCurrentView('editor');
               setActiveTab('content');
               setMobileView('editor');
               setShowMobileMenu(false);
             }}
             className="flex items-center gap-2 shrink-0 group text-left cursor-pointer"
-            title="홈(콘텐츠 탭)으로 이동"
+            title="에디터로 이동"
           >
             <div className="w-8 h-8 rounded-lg bg-zinc-950 group-hover:bg-zinc-800 text-white font-black text-sm flex items-center justify-center transition-colors">
               M
@@ -275,7 +302,7 @@ export function App() {
 
           <div className="h-4 w-[1px] bg-zinc-200 hidden sm:block shrink-0" />
 
-          {/* 현재 문서 제목 인라인 수정 & 데스크톱 보관함 버튼 */}
+          {/* 현재 문서 제목 인라인 수정 & 데스크톱 새 문서 / 보관함 버튼 */}
           <div className="flex items-center gap-1.5 min-w-0 flex-1">
             <span
               className={`hidden md:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0 ${
@@ -290,13 +317,25 @@ export function App() {
               type="text"
               value={activeDoc.name}
               onChange={(e) => renameDocument(activeDoc.id, e.target.value)}
-              className="text-xs sm:text-sm font-bold text-zinc-900 bg-zinc-100/80 hover:bg-zinc-100 focus:bg-white px-2.5 py-1.5 rounded-lg border border-transparent focus:border-zinc-900 outline-none truncate w-0 flex-1 max-w-[180px] sm:max-w-[220px]"
+              className="text-xs sm:text-sm font-bold text-zinc-900 bg-zinc-100/80 hover:bg-zinc-100 focus:bg-white px-2.5 py-1.5 rounded-lg border border-transparent focus:border-zinc-900 outline-none truncate w-0 flex-1 max-w-[170px] sm:max-w-[210px]"
               title="클릭하여 문서 제목 변경"
             />
             <button
               type="button"
+              onClick={() => {
+                setCreateModalType(activeDoc.docType === 'career' ? 'career' : 'resume');
+                setShowCreateModal(true);
+              }}
+              className="hidden lg:flex px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold items-center gap-1 shrink-0 cursor-pointer shadow-2xs"
+              title="새 문서 (샘플 5종 / 빈 문서)"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>새 문서</span>
+            </button>
+            <button
+              type="button"
               onClick={() => setShowDocDrawer(!showDocDrawer)}
-              className="hidden lg:flex px-2.5 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-xs font-semibold text-zinc-700 items-center gap-1 shrink-0"
+              className="hidden lg:flex px-2.5 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-xs font-semibold text-zinc-700 items-center gap-1 shrink-0 cursor-pointer"
               title="문서 보관함 열기"
             >
               <FolderOpen className="w-3.5 h-3.5 text-zinc-700" />
@@ -483,6 +522,31 @@ export function App() {
               <button
                 type="button"
                 onClick={() => {
+                  setCurrentView('home');
+                  setShowMobileMenu(false);
+                }}
+                className="p-3 rounded-xl border border-zinc-200 bg-zinc-100 hover:bg-zinc-200 text-xs font-bold text-zinc-900 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Home className="w-4 h-4 text-zinc-900" />
+                <span>홈 대시보드</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowMobileMenu(false);
+                  setCreateModalType(activeDoc.docType === 'career' ? 'career' : 'resume');
+                  setShowCreateModal(true);
+                }}
+                className="p-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>새 문서 만들기</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
                   setShowMobileMenu(false);
                   setShowDocDrawer(true);
                 }}
@@ -613,81 +677,29 @@ export function App() {
             </div>
 
             <div className="space-y-2 shrink-0">
-              {/* 이력서 생성 버튼 행 */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 sm:gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => {
-                    createNewDocument();
-                    setShowDocDrawer(false);
+                    setCreateModalType('resume');
+                    setShowCreateModal(true);
                   }}
-                  className="p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                  className="p-3 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs"
                 >
-                  <Plus className="w-4 h-4" />
-                  <span>새 이력서</span>
+                  <FileText className="w-4 h-4" />
+                  <span>새 이력서 만들기 (직군별 샘플 5종 / 빈 문서)</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => {
-                    createNewDocument(SAMPLE_CVS[0], SAMPLE_CVS[0].name);
-                    setShowDocDrawer(false);
+                    setCreateModalType('career');
+                    setShowCreateModal(true);
                   }}
-                  className="p-2.5 rounded-xl border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                  className="p-3 rounded-xl bg-indigo-950 hover:bg-indigo-900 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-zinc-500" />
-                  <span>개발자 이력서 샘플</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    createNewDocument(SAMPLE_CVS[1], SAMPLE_CVS[1].name);
-                    setShowDocDrawer(false);
-                  }}
-                  className="p-2.5 rounded-xl border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-zinc-500" />
-                  <span>연구원 이력서 샘플</span>
-                </button>
-              </div>
-
-              {/* 경력기술서 생성 버튼 행 */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 sm:gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    createNewDocument(createBlankCareerDoc(), '새 경력기술서');
-                    setShowDocDrawer(false);
-                  }}
-                  className="p-2.5 rounded-xl bg-indigo-950 hover:bg-indigo-900 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>새 경력기술서</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    createNewDocument(SAMPLE_CAREERS[0], SAMPLE_CAREERS[0].name);
-                    setShowDocDrawer(false);
-                  }}
-                  className="p-2.5 rounded-xl border border-indigo-200/80 bg-indigo-50/50 hover:bg-indigo-100/70 text-indigo-950 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>개발자 경력기술서 샘플</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    createNewDocument(SAMPLE_CAREERS[1], SAMPLE_CAREERS[1].name);
-                    setShowDocDrawer(false);
-                  }}
-                  className="p-2.5 rounded-xl border border-indigo-200/80 bg-indigo-50/50 hover:bg-indigo-100/70 text-indigo-950 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>연구원 경력기술서 샘플</span>
+                  <Briefcase className="w-4 h-4 text-indigo-300" />
+                  <span>새 경력기술서 만들기 (직군별 샘플 5종 / 빈 문서)</span>
                 </button>
               </div>
             </div>
@@ -765,85 +777,113 @@ export function App() {
         </div>
       )}
 
-      {/* 메인 좌우 분할 워크스페이스 */}
-      <div className="print-workspace-wrapper flex-1 flex overflow-hidden w-full">
-        {/* 좌측 에디터 패널 */}
-        <div
-          className={`editor-panel-container no-print w-full lg:w-[48%] xl:w-[45%] h-[calc(100dvh-105px)] xl:h-[calc(100dvh-56px)] overflow-y-auto overflow-x-hidden p-3 sm:p-6 pb-12 border-r border-zinc-200 bg-[#fafafa] ${
-            mobileView === 'preview' ? 'hidden lg:block' : 'block'
-          }`}
-        >
-          <div className="max-w-2xl mx-auto w-full">
-            {activeTab === 'content' && <ContentEditorPanel />}
-            {activeTab === 'fonts' && <FontStudioPanel />}
-            {activeTab === 'customize' && <CustomizePanel />}
-            {activeTab === 'export' && (
-              <ExportAndCloudPanel onOpenAuthModal={() => setShowAuthModal(true)} />
-            )}
-          </div>
-        </div>
-
-        {/* 우측 실시간 A4 캔버스 미리보기 영역 */}
-        <div
-          ref={previewContainerRef}
-          className={`print-container flex-1 w-full h-[calc(100dvh-56px)] lg:h-[calc(100dvh-105px)] xl:h-[calc(100dvh-56px)] overflow-auto bg-zinc-200/70 relative flex flex-col items-center py-3 sm:py-6 px-3 sm:px-4 pb-12 ${
-            mobileView === 'editor' ? 'hidden lg:flex' : 'flex'
-          }`}
-        >
-          {/* 상단 줌 & 인쇄 바 (이력서 용지를 가리지 않도록 깔끔하게 상단 배치) */}
-          <div className="no-print mb-3 flex items-center justify-between gap-2 bg-zinc-950/90 backdrop-blur text-white px-3 py-1.5 rounded-full shadow-md text-xs shrink-0">
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => handleZoomChange(-0.08)}
-                className="p-1 hover:text-zinc-300"
-                title="축소"
-              >
-                <ZoomOut className="w-3.5 h-3.5" />
-              </button>
-              <span className="font-mono font-semibold w-11 text-center">
-                {Math.round(effectiveZoom * 100)}%
-              </span>
-              <button
-                type="button"
-                onClick={() => handleZoomChange(0.08)}
-                className="p-1 hover:text-zinc-300"
-                title="확대"
-              >
-                <ZoomIn className="w-3.5 h-3.5" />
-              </button>
-              <button
-                type="button"
-                onClick={handleZoomReset}
-                className="p-1 hover:text-zinc-300 ml-1 border-l border-white/20 pl-2 flex items-center gap-1"
-                title="화면 폭에 맞춤"
-              >
-                <RotateCcw className="w-3 h-3" />
-                <span>맞춤</span>
-              </button>
+      {/* 뷰 모드에 따른 화면 렌더링: 홈 대시보드 vs 이력서/경력기술서 에디터 */}
+      {currentView === 'home' ? (
+        <LoggedInHomeDashboard
+          currentUser={currentUser}
+          onEnterEditor={(docId) => {
+            if (docId) selectDocument(docId);
+            setCurrentView('editor');
+          }}
+          onOpenCreateModal={(type) => {
+            if (type) setCreateModalType(type);
+            setShowCreateModal(true);
+          }}
+          onOpenDocDrawer={() => setShowDocDrawer(true)}
+        />
+      ) : (
+        /* 메인 좌우 분할 워크스페이스 */
+        <div className="print-workspace-wrapper flex-1 flex overflow-hidden w-full">
+          {/* 좌측 에디터 패널 */}
+          <div
+            className={`editor-panel-container no-print w-full lg:w-[48%] xl:w-[45%] h-[calc(100dvh-105px)] xl:h-[calc(100dvh-56px)] overflow-y-auto overflow-x-hidden p-3 sm:p-6 pb-12 border-r border-zinc-200 bg-[#fafafa] ${
+              mobileView === 'preview' ? 'hidden lg:block' : 'block'
+            }`}
+          >
+            <div className="max-w-2xl mx-auto w-full">
+              {activeTab === 'content' && <ContentEditorPanel />}
+              {activeTab === 'fonts' && <FontStudioPanel />}
+              {activeTab === 'customize' && <CustomizePanel />}
+              {activeTab === 'export' && (
+                <ExportAndCloudPanel onOpenAuthModal={() => setShowAuthModal(true)} />
+              )}
             </div>
           </div>
 
-          {/* 스케일된 A4 시트의 실제 레이아웃 크기를 잡아주는 래퍼 (모바일 좌우 잘림 및 하단 빈 여백 완벽 제거) */}
+          {/* 우측 실시간 A4 캔버스 미리보기 영역 */}
           <div
-            className="print-container relative mx-auto shrink-0"
-            style={{
-              width: `${Math.round(sheetBaseWidthPx * effectiveZoom)}px`,
-              height: `${Math.round(sheetNaturalHeight * effectiveZoom)}px`,
-            }}
+            ref={previewContainerRef}
+            className={`print-container flex-1 w-full h-[calc(100dvh-56px)] lg:h-[calc(100dvh-105px)] xl:h-[calc(100dvh-56px)] overflow-auto bg-zinc-200/70 relative flex flex-col items-center py-3 sm:py-6 px-3 sm:px-4 pb-12 ${
+              mobileView === 'editor' ? 'hidden lg:flex' : 'flex'
+            }`}
           >
+            {/* 상단 줌 & 인쇄 바 (이력서 용지를 가리지 않도록 깔끔하게 상단 배치) */}
+            <div className="no-print mb-3 flex items-center justify-between gap-2 bg-zinc-950/90 backdrop-blur text-white px-3 py-1.5 rounded-full shadow-md text-xs shrink-0">
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => handleZoomChange(-0.08)}
+                  className="p-1 hover:text-zinc-300"
+                  title="축소"
+                >
+                  <ZoomOut className="w-3.5 h-3.5" />
+                </button>
+                <span className="font-mono font-semibold w-11 text-center">
+                  {Math.round(effectiveZoom * 100)}%
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleZoomChange(0.08)}
+                  className="p-1 hover:text-zinc-300"
+                  title="확대"
+                >
+                  <ZoomIn className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleZoomReset}
+                  className="p-1 hover:text-zinc-300 ml-1 border-l border-white/20 pl-2 flex items-center gap-1"
+                  title="화면 폭에 맞춤"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  <span>맞춤</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 스케일된 A4 시트의 실제 레이아웃 크기를 잡아주는 래퍼 (모바일 좌우 잘림 및 하단 빈 여백 완벽 제거) */}
             <div
-              className="print-container origin-top-left transition-transform duration-150"
+              className="print-container relative mx-auto shrink-0"
               style={{
-                width: `${sheetBaseWidthPx}px`,
-                transform: `scale(${effectiveZoom})`,
+                width: `${Math.round(sheetBaseWidthPx * effectiveZoom)}px`,
+                height: `${Math.round(sheetNaturalHeight * effectiveZoom)}px`,
               }}
             >
-              <CVPreviewCanvas doc={activeDoc} />
+              <div
+                className="print-container origin-top-left transition-transform duration-150"
+                style={{
+                  width: `${sheetBaseWidthPx}px`,
+                  transform: `scale(${effectiveZoom})`,
+                }}
+              >
+                <CVPreviewCanvas doc={activeDoc} />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* 새 문서 선택 모달 (직군별 샘플 5종 / 빈 문서) */}
+      <CreateDocumentModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        initialType={createModalType}
+        onSelectDocument={(doc, nameOverride) => {
+          createNewDocument(doc, nameOverride);
+          setCurrentView('editor');
+          setShowDocDrawer(false);
+        }}
+      />
     </div>
   );
 }
