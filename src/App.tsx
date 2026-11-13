@@ -791,6 +791,9 @@ export function App() {
                     <div
                       onClick={() => {
                         selectDocument(item.id);
+                        setCurrentView('editor');
+                        setActiveTab('content');
+                        setMobileView('editor');
                         setShowDocDrawer(false);
                       }}
                       className="flex-1 min-w-0 cursor-pointer"
