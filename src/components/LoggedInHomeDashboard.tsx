@@ -181,8 +181,7 @@ export const LoggedInHomeDashboard: React.FC<LoggedInHomeDashboardProps> = ({
         {/* 상단 웰컴 배너 */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white border border-zinc-200/90 shadow-xs">
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[11px] font-bold text-zinc-600">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <div className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-zinc-100 text-[11px] font-bold text-zinc-600">
               <span>{currentUser.email}</span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black tracking-tight text-zinc-950">
