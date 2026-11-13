@@ -417,13 +417,13 @@ export const CAREER_JOB_SAMPLES: CVDocument[] = [
   // 5. 전략기획 및 신사업 개발 (Business Development & Operations)
   {
     id: 'sample-career-biz',
-    name: '정유진 — 전략기획 및 사업개발(BD) 경력기술서',
+    name: '정유진 — 사업개발 경력기술서',
     updatedAt: new Date().toISOString(),
     language: 'ko',
     docType: 'career',
     personal: {
       fullName: '정유진',
-      jobTitle: '시니어 사업개발 및 전략기획 매니저',
+      jobTitle: '시니어 사업개발 매니저',
       email: 'yujin.jung@maxcv.dev',
       phone: '010-5192-3847',
       location: '',

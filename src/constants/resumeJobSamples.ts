@@ -467,12 +467,12 @@ export const RESUME_JOB_SAMPLES: CVDocument[] = [
   // 5. 비즈니스 / 전략 기획
   {
     id: 'sample-resume-business',
-    name: '정유진 — 전략기획 및 사업개발',
+    name: '정유진 — 사업개발',
     updatedAt: new Date().toISOString(),
     language: 'ko',
     personal: {
       fullName: '정유진',
-      jobTitle: 'Business Development & Strategy Manager',
+      jobTitle: 'Business Development Manager',
       email: 'yujin.jung@maxcv.dev',
       phone: '010-5192-3847',
       location: '서울 영등포구',

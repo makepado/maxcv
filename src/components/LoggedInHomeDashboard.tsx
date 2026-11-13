@@ -74,7 +74,7 @@ const RESUME_SAMPLE_CARDS = [
   },
   {
     id: 'sample-resume-business',
-    role: '전략기획 및 사업개발',
+    role: '사업개발',
     badge: 'Business',
     summary: '대기업 12건 제휴 체결로 연 매출 180억 창출, B2B 카셰어링 구독 모델 런칭',
     icon: <LineChart className="w-5 h-5 text-blue-600" />,
@@ -122,7 +122,7 @@ const CAREER_SAMPLE_CARDS = [
   },
   {
     id: 'sample-career-biz',
-    role: '전략기획 및 사업개발',
+    role: '사업개발',
     badge: 'Business',
     summary: 'B2B 법인 카셰어링 120개사 유치, 차량 가동률 32%→68% 개선, 연 ARR 85억',
     icon: <Layers className="w-5 h-5 text-blue-700" />,
