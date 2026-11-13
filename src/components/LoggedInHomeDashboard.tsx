@@ -39,7 +39,7 @@ const RESUME_SAMPLE_CARDS = [
   {
     id: 'sample-resume-developer',
     role: '개발자',
-    badge: 'IT / Tech',
+    badge: 'Tech',
     summary: '프론트엔드 아키텍처 및 디자인 시스템, LCP 48% 단축 및 배포 주기 18분→4분 단축',
     icon: <Code className="w-5 h-5 text-sky-600" />,
     bg: 'bg-sky-50 border-sky-200/80',
