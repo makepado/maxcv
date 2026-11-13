@@ -100,6 +100,7 @@ ${sheetEl.outerHTML}
   const handleCopyShareLink = async () => {
     try {
       if (currentUser?.email) {
+        useCVStore.getState().commitDraftToLibrary();
         await fetch('/api/resumes', {
           method: 'POST',
           headers: {

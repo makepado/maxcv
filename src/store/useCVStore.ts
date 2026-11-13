@@ -15,6 +15,7 @@ interface CVStoreState {
   currentUser: GoogleUserProfile | null;
   googleClientId: string;
   documents: CVDocument[];
+  draftDoc: CVDocument | null;
   activeDocId: string;
   activeTab: 'content' | 'customize' | 'fonts' | 'templates' | 'export';
   previewZoom: number;
@@ -35,7 +36,8 @@ interface CVStoreState {
   setPreviewZoom: (zoom: number) => void;
   getActiveDocument: () => CVDocument;
   selectDocument: (docId: string) => void;
-  createNewDocument: (presetDoc?: CVDocument, nameOverride?: string) => void;
+  createNewDocument: (presetDoc?: CVDocument, nameOverride?: string, saveToLibrary?: boolean) => void;
+  commitDraftToLibrary: () => void;
   duplicateDocument: (docId: string) => void;
   deleteDocument: (docId: string) => void;
   renameDocument: (docId: string, name: string) => void;
@@ -86,15 +88,38 @@ function generateId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
 }
 
+function applyActiveDocUpdate(
+  state: CVStoreState,
+  updater: (doc: CVDocument) => CVDocument
+): Partial<CVStoreState> {
+  const common = {
+    canUndo: undoStack.length > 0,
+    canRedo: redoStack.length > 0,
+  };
+  if (state.draftDoc && state.draftDoc.id === state.activeDocId) {
+    return {
+      ...common,
+      draftDoc: updater(state.draftDoc),
+    };
+  }
+  return {
+    ...common,
+    documents: state.documents.map((doc) =>
+      doc.id === state.activeDocId ? updater(doc) : doc
+    ),
+  };
+}
+
 export const useCVStore = create<CVStoreState>()(
   persist(
     (set, get) => ({
       currentUser: null,
       googleClientId: '',
       documents: SAMPLE_CVS,
+      draftDoc: null,
       activeDocId: SAMPLE_CVS[0].id,
       activeTab: 'content',
-            previewZoom: 0.92,
+      previewZoom: 0.92,
       canUndo: false,
       canRedo: false,
 
@@ -104,11 +129,20 @@ export const useCVStore = create<CVStoreState>()(
         const previousDoc = undoStack.pop();
         if (!previousDoc) return;
         redoStack.push(cloneDoc(currentActive));
-        set((state) => ({
-          documents: state.documents.map((d) => (d.id === previousDoc.id ? previousDoc : d)),
-          canUndo: undoStack.length > 0,
-          canRedo: redoStack.length > 0,
-        }));
+        set((state) => {
+          const isDraftTarget = state.draftDoc && state.draftDoc.id === previousDoc.id;
+          return {
+            ...(isDraftTarget
+              ? { draftDoc: previousDoc }
+              : {
+                  documents: state.documents.map((d) =>
+                    d.id === previousDoc.id ? previousDoc : d
+                  ),
+                }),
+            canUndo: undoStack.length > 0,
+            canRedo: redoStack.length > 0,
+          };
+        });
       },
 
       redo: () => {
@@ -117,11 +151,18 @@ export const useCVStore = create<CVStoreState>()(
         const nextDoc = redoStack.pop();
         if (!nextDoc) return;
         undoStack.push(cloneDoc(currentActive));
-        set((state) => ({
-          documents: state.documents.map((d) => (d.id === nextDoc.id ? nextDoc : d)),
-          canUndo: undoStack.length > 0,
-          canRedo: redoStack.length > 0,
-        }));
+        set((state) => {
+          const isDraftTarget = state.draftDoc && state.draftDoc.id === nextDoc.id;
+          return {
+            ...(isDraftTarget
+              ? { draftDoc: nextDoc }
+              : {
+                  documents: state.documents.map((d) => (d.id === nextDoc.id ? nextDoc : d)),
+                }),
+            canUndo: undoStack.length > 0,
+            canRedo: redoStack.length > 0,
+          };
+        });
       },
 
       setCurrentUser: (user) => set({ currentUser: user }),
@@ -129,6 +170,7 @@ export const useCVStore = create<CVStoreState>()(
       setDocuments: (docs) =>
         set({
           documents: docs.length > 0 ? docs : SAMPLE_CVS,
+          draftDoc: null,
           activeDocId: docs.length > 0 ? docs[0].id : SAMPLE_CVS[0].id,
         }),
 
@@ -136,17 +178,22 @@ export const useCVStore = create<CVStoreState>()(
       setPreviewZoom: (zoom) => set({ previewZoom: Math.max(0.45, Math.min(1.5, zoom)) }),
 
       getActiveDocument: () => {
-        const { documents, activeDocId } = get();
+        const { documents, draftDoc, activeDocId } = get();
+        if (draftDoc && draftDoc.id === activeDocId) return draftDoc;
         return documents.find((d) => d.id === activeDocId) || documents[0];
       },
 
-            selectDocument: (docId) => {
+      selectDocument: (docId) => {
+        const { draftDoc, activeDocId } = get();
+        if (draftDoc && draftDoc.id === docId && activeDocId === docId) {
+          return;
+        }
         undoStack = [];
         redoStack = [];
-        set({ activeDocId: docId, canUndo: false, canRedo: false });
+        set({ activeDocId: docId, draftDoc: null, canUndo: false, canRedo: false });
       },
 
-      createNewDocument: (presetDoc, nameOverride) => {
+      createNewDocument: (presetDoc, nameOverride, saveToLibrary = false) => {
         const newId = generateId('cv');
         const baseDoc: CVDocument = presetDoc
           ? JSON.parse(JSON.stringify(presetDoc))
@@ -286,18 +333,44 @@ export const useCVStore = create<CVStoreState>()(
           baseDoc.name = `${presetDoc.name} (사본)`;
         }
 
-        set((state) => ({
-          canUndo: undoStack.length > 0,
-          canRedo: redoStack.length > 0,
-          documents: [baseDoc, ...state.documents],
-          activeDocId: newId,
-        }));
+        undoStack = [];
+        redoStack = [];
+
+        if (saveToLibrary) {
+          set((state) => ({
+            canUndo: false,
+            canRedo: false,
+            documents: [baseDoc, ...state.documents],
+            draftDoc: null,
+            activeDocId: newId,
+          }));
+        } else {
+          set({
+            canUndo: false,
+            canRedo: false,
+            draftDoc: baseDoc,
+            activeDocId: newId,
+          });
+        }
+      },
+
+      commitDraftToLibrary: () => {
+        set((state) => {
+          if (!state.draftDoc || state.draftDoc.id !== state.activeDocId) return state;
+          const exists = state.documents.some((d) => d.id === state.draftDoc!.id);
+          return {
+            documents: exists
+              ? state.documents.map((d) => (d.id === state.draftDoc!.id ? state.draftDoc! : d))
+              : [state.draftDoc, ...state.documents],
+            draftDoc: null,
+          };
+        });
       },
 
       duplicateDocument: (docId) => {
         const target = get().documents.find((d) => d.id === docId);
         if (!target) return;
-        get().createNewDocument(target);
+        get().createNewDocument(target, undefined, true);
       },
 
       deleteDocument: (docId) => {
@@ -314,13 +387,24 @@ export const useCVStore = create<CVStoreState>()(
       },
 
       renameDocument: (docId, name) => {
-        set((state) => ({
-          canUndo: undoStack.length > 0,
-          canRedo: redoStack.length > 0,
-          documents: state.documents.map((doc) =>
-            doc.id === docId ? { ...doc, name, updatedAt: new Date().toISOString() } : doc
-          ),
-        }));
+        set((state) => {
+          const common = {
+            canUndo: undoStack.length > 0,
+            canRedo: redoStack.length > 0,
+          };
+          if (state.draftDoc && state.draftDoc.id === docId) {
+            return {
+              ...common,
+              draftDoc: { ...state.draftDoc, name, updatedAt: new Date().toISOString() },
+            };
+          }
+          return {
+            ...common,
+            documents: state.documents.map((doc) =>
+              doc.id === docId ? { ...doc, name, updatedAt: new Date().toISOString() } : doc
+            ),
+          };
+        });
       },
 
       importDocumentJson: (importedDoc) => {
@@ -346,19 +430,13 @@ export const useCVStore = create<CVStoreState>()(
       updatePersonal: (patch) => {
         const active = get().getActiveDocument();
         if (active) pushUndoSnapshot(active);
-        set((state) => ({
-          canUndo: undoStack.length > 0,
-          canRedo: redoStack.length > 0,
-          documents: state.documents.map((doc) =>
-            doc.id === state.activeDocId
-              ? {
-                  ...doc,
-                  updatedAt: new Date().toISOString(),
-                  personal: { ...doc.personal, ...patch },
-                }
-              : doc
-          ),
-        }));
+        set((state) =>
+          applyActiveDocUpdate(state, (doc) => ({
+            ...doc,
+            updatedAt: new Date().toISOString(),
+            personal: { ...doc.personal, ...patch },
+          }))
+        );
       },
 
       addSection: (type, customTitle) => {
@@ -391,67 +469,46 @@ export const useCVStore = create<CVStoreState>()(
           ],
         };
 
-        set((state) => ({
-          canUndo: undoStack.length > 0,
-          canRedo: redoStack.length > 0,
-          documents: state.documents.map((doc) =>
-            doc.id === state.activeDocId
-              ? {
-                  ...doc,
-                  updatedAt: new Date().toISOString(),
-                  sections: [...doc.sections, newSection],
-                }
-              : doc
-          ),
-        }));
+        set((state) =>
+          applyActiveDocUpdate(state, (doc) => ({
+            ...doc,
+            updatedAt: new Date().toISOString(),
+            sections: [...doc.sections, newSection],
+          }))
+        );
       },
 
       updateSection: (sectionId, patch) => {
         const active = get().getActiveDocument();
         if (active) pushUndoSnapshot(active);
-        set((state) => ({
-          canUndo: undoStack.length > 0,
-          canRedo: redoStack.length > 0,
-          documents: state.documents.map((doc) =>
-            doc.id === state.activeDocId
-              ? {
-                  ...doc,
-                  updatedAt: new Date().toISOString(),
-                  sections: doc.sections.map((sec) =>
-                    sec.id === sectionId ? { ...sec, ...patch } : sec
-                  ),
-                }
-              : doc
-          ),
-        }));
+        set((state) =>
+          applyActiveDocUpdate(state, (doc) => ({
+            ...doc,
+            updatedAt: new Date().toISOString(),
+            sections: doc.sections.map((sec) =>
+              sec.id === sectionId ? { ...sec, ...patch } : sec
+            ),
+          }))
+        );
       },
 
       removeSection: (sectionId) => {
         const active = get().getActiveDocument();
         if (active) pushUndoSnapshot(active);
-        set((state) => ({
-          canUndo: undoStack.length > 0,
-          canRedo: redoStack.length > 0,
-          documents: state.documents.map((doc) =>
-            doc.id === state.activeDocId
-              ? {
-                  ...doc,
-                  updatedAt: new Date().toISOString(),
-                  sections: doc.sections.filter((sec) => sec.id !== sectionId),
-                }
-              : doc
-          ),
-        }));
+        set((state) =>
+          applyActiveDocUpdate(state, (doc) => ({
+            ...doc,
+            updatedAt: new Date().toISOString(),
+            sections: doc.sections.filter((sec) => sec.id !== sectionId),
+          }))
+        );
       },
 
       moveSectionOrder: (sectionId, direction) => {
         const active = get().getActiveDocument();
         if (active) pushUndoSnapshot(active);
-        set((state) => ({
-          canUndo: undoStack.length > 0,
-          canRedo: redoStack.length > 0,
-          documents: state.documents.map((doc) => {
-            if (doc.id !== state.activeDocId) return doc;
+        set((state) =>
+          applyActiveDocUpdate(state, (doc) => {
             const idx = doc.sections.findIndex((s) => s.id === sectionId);
             if (idx === -1) return doc;
             const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
@@ -464,30 +521,24 @@ export const useCVStore = create<CVStoreState>()(
               updatedAt: new Date().toISOString(),
               sections: nextSections,
             };
-          }),
-        }));
+          })
+        );
       },
 
       toggleSectionColumn: (sectionId) => {
         const active = get().getActiveDocument();
         if (active) pushUndoSnapshot(active);
-        set((state) => ({
-          canUndo: undoStack.length > 0,
-          canRedo: redoStack.length > 0,
-          documents: state.documents.map((doc) =>
-            doc.id === state.activeDocId
-              ? {
-                  ...doc,
-                  updatedAt: new Date().toISOString(),
-                  sections: doc.sections.map((sec) =>
-                    sec.id === sectionId
-                      ? { ...sec, column: sec.column === 'main' ? 'sidebar' : 'main' }
-                      : sec
-                  ),
-                }
-              : doc
-          ),
-        }));
+        set((state) =>
+          applyActiveDocUpdate(state, (doc) => ({
+            ...doc,
+            updatedAt: new Date().toISOString(),
+            sections: doc.sections.map((sec) =>
+              sec.id === sectionId
+                ? { ...sec, column: sec.column === 'main' ? 'sidebar' : 'main' }
+                : sec
+            ),
+          }))
+        );
       },
 
       addSectionItem: (sectionId) => {
@@ -509,163 +560,123 @@ export const useCVStore = create<CVStoreState>()(
           level: 4,
           levelText: '',
         };
-        set((state) => ({
-          canUndo: undoStack.length > 0,
-          canRedo: redoStack.length > 0,
-          documents: state.documents.map((doc) =>
-            doc.id === state.activeDocId
-              ? {
-                  ...doc,
-                  updatedAt: new Date().toISOString(),
-                  sections: doc.sections.map((sec) =>
-                    sec.id === sectionId
-                      ? { ...sec, items: [...sec.items, newItem] }
-                      : sec
-                  ),
-                }
-              : doc
-          ),
-        }));
+        set((state) =>
+          applyActiveDocUpdate(state, (doc) => ({
+            ...doc,
+            updatedAt: new Date().toISOString(),
+            sections: doc.sections.map((sec) =>
+              sec.id === sectionId
+                ? { ...sec, items: [...sec.items, newItem] }
+                : sec
+            ),
+          }))
+        );
       },
 
       updateSectionItem: (sectionId, itemId, patch) => {
         const active = get().getActiveDocument();
         if (active) pushUndoSnapshot(active);
-        set((state) => ({
-          canUndo: undoStack.length > 0,
-          canRedo: redoStack.length > 0,
-          documents: state.documents.map((doc) =>
-            doc.id === state.activeDocId
-              ? {
-                  ...doc,
-                  updatedAt: new Date().toISOString(),
-                  sections: doc.sections.map((sec) =>
-                    sec.id === sectionId
-                      ? {
-                          ...sec,
-                          items: sec.items.map((item) =>
-                            item.id === itemId ? { ...item, ...patch } : item
-                          ),
-                        }
-                      : sec
-                  ),
-                }
-              : doc
-          ),
-        }));
+        set((state) =>
+          applyActiveDocUpdate(state, (doc) => ({
+            ...doc,
+            updatedAt: new Date().toISOString(),
+            sections: doc.sections.map((sec) =>
+              sec.id === sectionId
+                ? {
+                    ...sec,
+                    items: sec.items.map((item) =>
+                      item.id === itemId ? { ...item, ...patch } : item
+                    ),
+                  }
+                : sec
+            ),
+          }))
+        );
       },
 
       removeSectionItem: (sectionId, itemId) => {
         const active = get().getActiveDocument();
         if (active) pushUndoSnapshot(active);
-        set((state) => ({
-          canUndo: undoStack.length > 0,
-          canRedo: redoStack.length > 0,
-          documents: state.documents.map((doc) =>
-            doc.id === state.activeDocId
-              ? {
-                  ...doc,
-                  updatedAt: new Date().toISOString(),
-                  sections: doc.sections.map((sec) =>
-                    sec.id === sectionId
-                      ? { ...sec, items: sec.items.filter((i) => i.id !== itemId) }
-                      : sec
-                  ),
-                }
-              : doc
-          ),
-        }));
+        set((state) =>
+          applyActiveDocUpdate(state, (doc) => ({
+            ...doc,
+            updatedAt: new Date().toISOString(),
+            sections: doc.sections.map((sec) =>
+              sec.id === sectionId
+                ? { ...sec, items: sec.items.filter((i) => i.id !== itemId) }
+                : sec
+            ),
+          }))
+        );
       },
 
       duplicateSectionItem: (sectionId, itemId) => {
         const active = get().getActiveDocument();
         if (active) pushUndoSnapshot(active);
-        set((state) => ({
-          canUndo: undoStack.length > 0,
-          canRedo: redoStack.length > 0,
-          documents: state.documents.map((doc) => {
-            if (doc.id !== state.activeDocId) return doc;
-            return {
-              ...doc,
-              updatedAt: new Date().toISOString(),
-              sections: doc.sections.map((sec) => {
-                if (sec.id !== sectionId) return sec;
-                const idx = sec.items.findIndex((i) => i.id === itemId);
-                if (idx === -1) return sec;
-                const copy: SectionItem = {
-                  ...JSON.parse(JSON.stringify(sec.items[idx])),
-                  id: generateId('item'),
-                };
-                const nextItems = [...sec.items];
-                nextItems.splice(idx + 1, 0, copy);
-                return { ...sec, items: nextItems };
-              }),
-            };
-          }),
-        }));
+        set((state) =>
+          applyActiveDocUpdate(state, (doc) => ({
+            ...doc,
+            updatedAt: new Date().toISOString(),
+            sections: doc.sections.map((sec) => {
+              if (sec.id !== sectionId) return sec;
+              const idx = sec.items.findIndex((i) => i.id === itemId);
+              if (idx === -1) return sec;
+              const copy: SectionItem = {
+                ...JSON.parse(JSON.stringify(sec.items[idx])),
+                id: generateId('item'),
+              };
+              const nextItems = [...sec.items];
+              nextItems.splice(idx + 1, 0, copy);
+              return { ...sec, items: nextItems };
+            }),
+          }))
+        );
       },
 
       moveSectionItemOrder: (sectionId, itemId, direction) => {
         const active = get().getActiveDocument();
         if (active) pushUndoSnapshot(active);
-        set((state) => ({
-          canUndo: undoStack.length > 0,
-          canRedo: redoStack.length > 0,
-          documents: state.documents.map((doc) => {
-            if (doc.id !== state.activeDocId) return doc;
-            return {
-              ...doc,
-              updatedAt: new Date().toISOString(),
-              sections: doc.sections.map((sec) => {
-                if (sec.id !== sectionId) return sec;
-                const idx = sec.items.findIndex((i) => i.id === itemId);
-                if (idx === -1) return sec;
-                const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
-                if (targetIdx < 0 || targetIdx >= sec.items.length) return sec;
-                const nextItems = [...sec.items];
-                const [moved] = nextItems.splice(idx, 1);
-                nextItems.splice(targetIdx, 0, moved);
-                return { ...sec, items: nextItems };
-              }),
-            };
-          }),
-        }));
+        set((state) =>
+          applyActiveDocUpdate(state, (doc) => ({
+            ...doc,
+            updatedAt: new Date().toISOString(),
+            sections: doc.sections.map((sec) => {
+              if (sec.id !== sectionId) return sec;
+              const idx = sec.items.findIndex((i) => i.id === itemId);
+              if (idx === -1) return sec;
+              const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+              if (targetIdx < 0 || targetIdx >= sec.items.length) return sec;
+              const nextItems = [...sec.items];
+              const [moved] = nextItems.splice(idx, 1);
+              nextItems.splice(targetIdx, 0, moved);
+              return { ...sec, items: nextItems };
+            }),
+          }))
+        );
       },
 
       updateDesign: (patch) => {
         const active = get().getActiveDocument();
         if (active) pushUndoSnapshot(active);
-        set((state) => ({
-          canUndo: undoStack.length > 0,
-          canRedo: redoStack.length > 0,
-          documents: state.documents.map((doc) =>
-            doc.id === state.activeDocId
-              ? {
-                  ...doc,
-                  updatedAt: new Date().toISOString(),
-                  design: { ...doc.design, ...patch },
-                }
-              : doc
-          ),
-        }));
+        set((state) =>
+          applyActiveDocUpdate(state, (doc) => ({
+            ...doc,
+            updatedAt: new Date().toISOString(),
+            design: { ...doc.design, ...patch },
+          }))
+        );
       },
 
       resetDesign: () => {
         const active = get().getActiveDocument();
         if (active) pushUndoSnapshot(active);
-        set((state) => ({
-          canUndo: undoStack.length > 0,
-          canRedo: redoStack.length > 0,
-          documents: state.documents.map((doc) =>
-            doc.id === state.activeDocId
-              ? {
-                  ...doc,
-                  updatedAt: new Date().toISOString(),
-                  design: { ...DEFAULT_DESIGN_SETTINGS },
-                }
-              : doc
-          ),
-        }));
+        set((state) =>
+          applyActiveDocUpdate(state, (doc) => ({
+            ...doc,
+            updatedAt: new Date().toISOString(),
+            design: { ...DEFAULT_DESIGN_SETTINGS },
+          }))
+        );
       },
     }),
     {

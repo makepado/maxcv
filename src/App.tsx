@@ -43,6 +43,7 @@ import { printVectorPdfClean } from './utils/pdfExport';
 export function App() {
   const currentUser = useCVStore((s) => s.currentUser);
   const documents = useCVStore((s) => s.documents);
+  const draftDoc = useCVStore((s) => s.draftDoc);
   const activeDocId = useCVStore((s) => s.activeDocId);
   const activeTab = useCVStore((s) => s.activeTab);
   const previewZoom = useCVStore((s) => s.previewZoom);
@@ -57,12 +58,16 @@ export function App() {
   const selectDocument = useCVStore((s) => s.selectDocument);
   const setDocuments = useCVStore((s) => s.setDocuments);
   const createNewDocument = useCVStore((s) => s.createNewDocument);
+  const commitDraftToLibrary = useCVStore((s) => s.commitDraftToLibrary);
   const duplicateDocument = useCVStore((s) => s.duplicateDocument);
   const deleteDocument = useCVStore((s) => s.deleteDocument);
   const renameDocument = useCVStore((s) => s.renameDocument);
   const importDocumentJson = useCVStore((s) => s.importDocumentJson);
 
-  const activeDoc = documents.find((d) => d.id === activeDocId) || documents[0];
+  const activeDoc =
+    (draftDoc && draftDoc.id === activeDocId
+      ? draftDoc
+      : documents.find((d) => d.id === activeDocId)) || documents[0];
 
   const [showDocDrawer, setShowDocDrawer] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -218,6 +223,7 @@ export function App() {
       setShowAuthModal(true);
       return;
     }
+    commitDraftToLibrary();
     try {
       await fetch('/api/resumes', {
         method: 'POST',
