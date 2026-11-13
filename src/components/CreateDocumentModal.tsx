@@ -32,7 +32,7 @@ interface CreateDocumentModalProps {
 const RESUME_METAS = [
   {
     id: 'sample-resume-developer',
-    role: '프론트엔드 및 소프트웨어 엔지니어',
+    role: '개발자',
     badge: 'IT / Tech',
     summary: '프론트엔드 아키텍처 및 디자인 시스템, LCP 48% 개선 및 배포 주기 단축',
     icon: <Code className="w-4 h-4 text-sky-600" />,

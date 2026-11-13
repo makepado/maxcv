@@ -262,7 +262,7 @@ export function App() {
   return (
     <div className="min-h-dvh w-full max-w-[100vw] overflow-x-hidden flex flex-col bg-[#fafafa] text-zinc-900">
       {/* 상단 글로벌 네비게이션 바 (인쇄 시 숨김) */}
-      <header className="no-print sticky top-0 z-30 h-14 bg-white/95 backdrop-blur border-b border-zinc-200/90 px-3 sm:px-4 flex items-center justify-between gap-2">
+      <header className="no-print sticky top-0 z-30 h-14 bg-white/95 backdrop-blur border-b border-zinc-200/90 px-3 sm:px-4 flex items-center justify-between gap-2 relative">
         {/* 좌측: 홈 버튼 및 (에디터 모드일 때) 현재 문서 제목 + 새 문서/보관함 */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 flex-1">
           {/* 홈화면(대시보드)으로 이동하는 홈 버튼 */}
@@ -325,6 +325,23 @@ export function App() {
             </div>
           )}
         </div>
+
+        {/* 홈 화면일 때 상단 헤더 중앙 브랜드 마크 */}
+        {currentView === 'home' && (
+          <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 pointer-events-none select-none">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-950 text-white font-black text-xs sm:text-sm flex items-center justify-center shadow-2xs">
+              M
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="font-extrabold text-sm sm:text-base tracking-tight text-zinc-950">
+                MaxCV
+              </span>
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200">
+                Studio
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* 중앙 메인 탭 전환 (데스크톱 xl 이상) & 실행취소/다시실행 스택 버튼 - 에디터 모드일 때만 표시 */}
         {currentView === 'editor' && (

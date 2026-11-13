@@ -38,7 +38,7 @@ interface LoggedInHomeDashboardProps {
 const RESUME_SAMPLE_CARDS = [
   {
     id: 'sample-resume-developer',
-    role: '프론트엔드 및 소프트웨어 엔지니어',
+    role: '개발자',
     badge: 'IT / Tech',
     summary: '프론트엔드 아키텍처 및 디자인 시스템, LCP 48% 단축 및 배포 주기 18분→4분 단축',
     icon: <Code className="w-5 h-5 text-sky-600" />,
@@ -213,8 +213,99 @@ export const LoggedInHomeDashboard: React.FC<LoggedInHomeDashboardProps> = ({
           </div>
         </div>
 
+        {/* 내 보관함 최근 문서 목록 (상단 배치) */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between px-1">
+            <div className="flex items-center gap-2">
+              <FolderOpen className="w-4 h-4 text-zinc-700" />
+              <h3 className="text-sm sm:text-base font-extrabold text-zinc-950">
+                내 문서 보관함 ({documents.length})
+              </h3>
+            </div>
+            <button
+              type="button"
+              onClick={onOpenDocDrawer}
+              className="text-xs font-bold text-zinc-600 hover:text-zinc-950 flex items-center gap-1 cursor-pointer"
+            >
+              <span>전체 보기</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {myRecentDocs.map((doc) => {
+              const isCareer = doc.docType === 'career';
+              const isCurrent = doc.id === activeDocId;
+              return (
+                <div
+                  key={doc.id}
+                  className="p-3.5 rounded-xl bg-white border border-zinc-200/90 hover:border-zinc-400 flex items-center justify-between gap-3 transition-all"
+                >
+                  <div
+                    onClick={() => handleOpenDoc(doc.id)}
+                    className="flex-1 min-w-0 cursor-pointer"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${
+                          isCareer
+                            ? 'bg-indigo-100 text-indigo-800'
+                            : 'bg-zinc-100 text-zinc-700 border border-zinc-200'
+                        }`}
+                      >
+                        {isCareer ? '경력기술서' : '이력서'}
+                      </span>
+                      <h5 className="font-extrabold text-xs sm:text-sm text-zinc-900 truncate">
+                        {doc.name}
+                      </h5>
+                      {isCurrent && (
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-900 text-white shrink-0">
+                          선택됨
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[11px] text-zinc-500 mt-1 truncate">
+                      {doc.personal.fullName} · {doc.personal.jobTitle} · 섹션 {doc.sections.length}
+                      개
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => duplicateDocument(doc.id)}
+                      className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 transition-colors"
+                      title="복제"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                    {documents.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => deleteDocument(doc.id)}
+                        className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-zinc-100 transition-colors"
+                        title="삭제"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => handleOpenDoc(doc.id)}
+                      className="px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold flex items-center gap-1 transition-colors"
+                    >
+                      <span>열기</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* 탭: 이력서 vs 경력기술서 */}
-        <div className="space-y-4">
+        <div className="pt-4 border-t border-zinc-200 space-y-4">
           <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
             {/* 상위 대분류 탭 버튼 (괄호 제거 및 간결한 구성) */}
             <div className="flex items-center gap-2">
@@ -347,97 +438,6 @@ export const LoggedInHomeDashboard: React.FC<LoggedInHomeDashboardProps> = ({
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-
-        {/* 내 보관함 최근 문서 목록 */}
-        <div className="pt-4 border-t border-zinc-200 space-y-3">
-          <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-2">
-              <FolderOpen className="w-4 h-4 text-zinc-700" />
-              <h3 className="text-sm sm:text-base font-extrabold text-zinc-950">
-                내 문서 보관함 ({documents.length})
-              </h3>
-            </div>
-            <button
-              type="button"
-              onClick={onOpenDocDrawer}
-              className="text-xs font-bold text-zinc-600 hover:text-zinc-950 flex items-center gap-1 cursor-pointer"
-            >
-              <span>전체 보기</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            {myRecentDocs.map((doc) => {
-              const isCareer = doc.docType === 'career';
-              const isCurrent = doc.id === activeDocId;
-              return (
-                <div
-                  key={doc.id}
-                  className="p-3.5 rounded-xl bg-white border border-zinc-200/90 hover:border-zinc-400 flex items-center justify-between gap-3 transition-all"
-                >
-                  <div
-                    onClick={() => handleOpenDoc(doc.id)}
-                    className="flex-1 min-w-0 cursor-pointer"
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <span
-                        className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${
-                          isCareer
-                            ? 'bg-indigo-100 text-indigo-800'
-                            : 'bg-zinc-100 text-zinc-700 border border-zinc-200'
-                        }`}
-                      >
-                        {isCareer ? '경력기술서' : '이력서'}
-                      </span>
-                      <h5 className="font-extrabold text-xs sm:text-sm text-zinc-900 truncate">
-                        {doc.name}
-                      </h5>
-                      {isCurrent && (
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-900 text-white shrink-0">
-                          선택됨
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-[11px] text-zinc-500 mt-1 truncate">
-                      {doc.personal.fullName} · {doc.personal.jobTitle} · 섹션 {doc.sections.length}
-                      개
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => duplicateDocument(doc.id)}
-                      className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 transition-colors"
-                      title="복제"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                    </button>
-                    {documents.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => deleteDocument(doc.id)}
-                        className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-zinc-100 transition-colors"
-                        title="삭제"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => handleOpenDoc(doc.id)}
-                      className="px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold flex items-center gap-1 transition-colors"
-                    >
-                      <span>열기</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </div>
       </main>
