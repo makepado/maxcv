@@ -80,7 +80,7 @@ const RESUME_METAS = [
 const CAREER_METAS = [
   {
     id: 'sample-career-backend',
-    role: '백엔드 및 클라우드 엔지니어',
+    role: '백엔드 엔지니어',
     badge: 'Backend',
     summary: '피크 TPS 35,000 분산 락/큐잉 시스템 구축, 정산 배치 88% 단축 파이프라인',
     icon: <Server className="w-4 h-4 text-slate-700" />,

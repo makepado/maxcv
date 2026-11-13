@@ -50,16 +50,16 @@ const CAREER_BASE_DESIGN = {
 };
 
 export const CAREER_JOB_SAMPLES: CVDocument[] = [
-  // 1. 백엔드/클라우드 엔지니어
+  // 1. 백엔드 엔지니어
   {
     id: 'sample-career-backend',
-    name: '강태양 — 백엔드 및 클라우드 엔지니어 경력기술서',
+    name: '강태양 — 백엔드 엔지니어 경력기술서',
     updatedAt: new Date().toISOString(),
     language: 'ko',
     docType: 'career',
     personal: {
       fullName: '강태양',
-      jobTitle: '시니어 백엔드 및 분산시스템 엔지니어',
+      jobTitle: '백엔드 엔지니어',
       email: 'taeyang.kang@maxcv.dev',
       phone: '010-7294-8192',
       location: '',
@@ -86,7 +86,7 @@ export const CAREER_JOB_SAMPLES: CVDocument[] = [
         item('cb-sum-1', {
           title: '총 경력 8년 · 대규모 분산 트랜잭션 및 고가용성 마이크로서비스 설계',
           description:
-            '• 피크 타임 TPS 35,000 수준의 이커머스 결제/주문 시스템 아키텍처를 설계하고 운영했습니다.\n• 모놀리스 시스템의 MSA 분해 및 Kafka 기반 이벤트 주도 아키텍처(EDA) 전환을 주도했습니다.\n• AWS 클라우드 인프라 비용 35% 절감 및 P99 지연 시간(Latency) 120ms → 28ms 단축을 달성했습니다.',
+            '• 피크 타임 TPS 35,000 수준의 이커머스 결제/주문 시스템 아키텍처를 설계하고 운영했습니다.\n• 모놀리식 시스템의 MSA 전환 및 Kafka 기반 이벤트 주도 아키텍처(EDA) 전환을 주도했습니다.\n• AWS 클라우드 인프라 비용 35% 절감 및 P99 지연 시간(Latency) 120ms → 28ms 단축을 달성했습니다.',
         }),
       ]),
       section('cb-exp', 'experience', '경력 사항', [
